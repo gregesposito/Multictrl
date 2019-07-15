@@ -8,14 +8,24 @@ Also included is loading addons/commands for Quetz farming.
 
 Current commands:  Use //multi or //mc
 
+================================================================================
 
 ON:  Toggles all addons that are defined under ON function such as healbot/autogeo/roller/singer etc.
+
 OFF:  Toggles all addons to turn off.
+
 Loadquetz:  Loads custom addon/commands for farming Quetz (See Quetz repository)
+
 fon:  Toggles healbot's follow on function, will follow to the current player executing this command.
+
 foff:  Disable following via healbot's function.
+
 warp:  Warp all chars using myhome addon.
+
 omen:  Warps all chars to omen crag using myomen addon. (See MyOmen repository)
+
 mount:  Mount all chars using defined mount.
+
 dismount:  Dismount all chars.
+
 refresh:  Reload healbot or more addons if you defined it.
