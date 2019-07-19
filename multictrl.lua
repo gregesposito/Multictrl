@@ -149,7 +149,7 @@ end
 
 function loadquetz(namearg)
 	log('Set addon commands for Quetz farming.')
-	
+	currentPC=windower.ffxi.get_player()
 	-- Here change whatever commands you want your addons to use.
 	
 	-- If IPC false means your party leader commands, no assist.
