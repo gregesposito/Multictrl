@@ -181,15 +181,12 @@ function loadquetz(namearg)
 	end
 		
 	if currentPC.main_job == 'PLD' then
-		windower.send_command('gs disable main')
-		windower.send_command('/equip main \'Naegling\'')
 		windower.send_command('hb mincure 4')
 		windower.send_command('autows use savage blade')
 		windower.send_command('autows hp > 0 < 99')
 		windower.send_command('autows on')
 	elseif currentPC.main_job == 'WAR' then
 		windower.send_command('hb buff ' .. currentPC.name .. ' berserk')
-		windower.send_command('hb buff ' .. currentPC.name .. ' hasso')
 		windower.send_command('hb buff ' .. currentPC.name .. ' retaliation')
 		windower.send_command('hb buff ' .. currentPC.name .. ' restraint')
 		windower.send_command('hb buff ' .. currentPC.name .. ' blood rage')
@@ -224,7 +221,6 @@ function loadquetz(namearg)
 		windower.send_command('geo entrust off')
 		windower.send_command('hb buff ' .. currentPC.name .. ' haste')
 		windower.send_command('hb mincure 4')
-		windower.send_command('hb debuff dia ii')
 		windower.send_command('autows use hexa strike')
 		windower.send_command('autows hp > 0 < 99')
 		windower.send_command('autows on')
@@ -234,6 +230,39 @@ function loadquetz(namearg)
 		windower.send_command('autows use evisceration')
 		windower.send_command('autows hp > 0 < 99')
 		windower.send_command('autows on')
+	elseif currentPC.main_job == 'THF' then
+		windower.send_command('autows use rudra\'s storm')
+		windower.send_command('autows hp > 0 < 99')
+		windower.send_command('autows on')
+	elseif currentPC.main_job == 'NIN' then
+		windower.send_command('autows use Blade: Ten')
+		windower.send_command('autows hp > 0 < 99')
+		windower.send_command('autows on')
+	elseif currentPC.main_job == 'SAM' then
+		windower.send_command('hb buff ' .. currentPC.name .. ' hasso')
+		windower.send_command('autows use Tachi: Fudo')
+		windower.send_command('autows hp > 0 < 99')
+		windower.send_command('autows on')
+	elseif currentPC.main_job == 'MNK' then
+		windower.send_command('autows use Victory Smite')
+		windower.send_command('autows hp > 0 < 99')
+		windower.send_command('autows on')
+	elseif currentPC.main_job == 'DRG' then
+		windower.send_command('autows use Stardiver')
+		windower.send_command('autows hp > 0 < 99')
+		windower.send_command('autows on')
+	elseif currentPC.main_job == 'BLU' then
+		windower.send_command('autows use Chant Du Cygne')
+		windower.send_command('autows hp > 0 < 99')
+		windower.send_command('autows on')
+	end
+	
+	-- Sub job abilities
+	if currentPC.sub_job == 'WAR' then
+		windower.send_command('hb buff ' .. currentPC.name .. ' berserk')
+		windower.send_command('hb buff ' .. currentPC.name .. ' aggressor')
+	elseif currentPC.sub_job == 'SAM' then
+		windower.send_command('hb buff ' .. currentPC.name .. ' hasso')
 	end
 	
 	ipcflag = false
