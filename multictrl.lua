@@ -22,8 +22,6 @@ windower.register_event('addon command', function(input, ...)
 		on()
 	elseif cmd == 'off' then
 		off()
-	elseif cmd == 'loadquetz' then
-		loadquetz()
 	elseif cmd == 'fon' then
 		followon()
 	elseif cmd == 'foff' then
@@ -38,6 +36,8 @@ windower.register_event('addon command', function(input, ...)
 		dismount()
 	elseif cmd == 'refresh' then
 		refresh()
+	elseif cmd == 'd2' then
+		d2()
     end
 end)
 
@@ -52,6 +52,37 @@ function refresh()
 		windower.send_ipc_message('refresh')
 	end
 	ipcflag = false
+end
+
+function d2()
+
+	for k, v in pairs(windower.ffxi.get_party()) do
+		if type(v) == 'table' then
+			if v.name ~= currentPC.name then
+			
+				ptymember = windower.ffxi.get_mob_by_name(v.name)
+				-- check if party member in same zone.
+
+				if v.mob == nil then
+					-- Not in zone.
+					log(v.name .. ' is not in zone, skipping')
+					coroutine.sleep(0.5)
+				else
+					-- In zone, do distance check
+					if math.sqrt(ptymember.distance) < 18 then
+						log('Warping ' .. v.name)
+						windower.send_command('input /ma "Warp II" ' .. v.name)
+						coroutine.sleep(9)
+					else
+						log(v.name .. ' is too far to warp, skipping')
+						coroutine.sleep(0.5)
+					end
+				end
+
+			end
+		end
+	end
+	windower.send_command('input /ma "Warp" ' .. currentPC.name)
 end
 
 function omen()
@@ -150,130 +181,6 @@ end
 
 
 
-function loadquetz(namearg)
-	log('Set addon commands for Quetz farming.')
-	currentPC=windower.ffxi.get_player()
-	-- Here change whatever commands you want your addons to use.
-	
-	-- If IPC false means your party leader commands, no assist.
-	if ipcflag == false then
-
-		windower.send_ipc_message('loadquetz ' .. currentPC.name)
-		
-		windower.send_command('lua r healbot')
-		windower.send_command('lua r autows')
-		windower.send_command('lua r settarget')
-		windower.send_command('lua r anchor')
-		coroutine.sleep(1.0)
-		
-	-- Commands here for alts that aren't party leaders.
-	elseif ipcflag == true then
-	
-		windower.send_command('lua r healbot')
-		windower.send_command('lua r autows')
-		windower.send_command('lua r settarget')
-		windower.send_command('lua r anchor')
-		coroutine.sleep(1.0)
-		windower.send_command('hb assist ' .. namearg .. '')
-		windower.send_command('hb assist attack')
-		windower.send_command('hb follow ' .. namearg .. '')
-		windower.send_command('hb follow dist 4')
-	end
-		
-	if currentPC.main_job == 'PLD' then
-		windower.send_command('hb mincure 4')
-		windower.send_command('autows use savage blade')
-		windower.send_command('autows hp > 0 < 99')
-		windower.send_command('autows on')
-	elseif currentPC.main_job == 'WAR' then
-		windower.send_command('hb buff ' .. currentPC.name .. ' berserk')
-		windower.send_command('hb buff ' .. currentPC.name .. ' retaliation')
-		windower.send_command('hb buff ' .. currentPC.name .. ' restraint')
-		windower.send_command('hb buff ' .. currentPC.name .. ' blood rage')
-		windower.send_command('autows use impulse drive')
-		windower.send_command('autows hp > 0 < 99')
-		windower.send_command('autows on')
-	elseif currentPC.main_job == 'WHM' then
-		windower.send_command('hb bufflist whm ' .. currentPC.name .. '')
-		windower.send_command('hb buff ' .. currentPC.name .. ' auspice')
-		windower.send_command('hb buff ' .. currentPC.name .. ' boost-dex')
-		windower.send_command('hb buff ' .. currentPC.name .. ' baraera')
-		windower.send_command('hb buff ' .. currentPC.name .. ' barsilencera')
-		windower.send_command('gs disable main')
-		windower.send_command('gs disable sub')
-		windower.send_command('input /equip main \'Nibiru Cudgel\'; wait 1.0; input /equip sub \'Bolelabunga\'')
-		-- WHM buffs haste on party
-
-		for k, v in pairs(windower.ffxi.get_party()) do
-			if type(v) == 'table' then
-				if v.name ~= currentPC.name then
-					windower.send_command('hb buff ' .. v.name .. ' haste')
-				end
-			end
-		end
-		
-		windower.send_command('autows use hexa strike')
-		windower.send_command('autows hp > 0 < 99')
-		windower.send_command('autows on')
-	elseif currentPC.main_job == 'GEO' then
-		windower.send_command('lua r autogeo')
-		coroutine.sleep(1.0)
-		windower.send_command('geo geo frailty')
-		windower.send_command('geo indi haste')
-		windower.send_command('geo entrust off')
-		windower.send_command('hb buff ' .. currentPC.name .. ' haste')
-		windower.send_command('hb mincure 4')
-		windower.send_command('autows use hexa strike')
-		windower.send_command('autows hp > 0 < 99')
-		windower.send_command('autows on')
-	elseif currentPC.main_job == 'COR' then
-		windower.send_command('lua r roller')
-		coroutine.sleep(1.0)
-		windower.send_command('roller roll1 chaos')
-		windower.send_command('roller roll2 rogue')
-		windower.send_command('autows use evisceration')
-		windower.send_command('autows hp > 0 < 99')
-		windower.send_command('autows on')
-	elseif currentPC.main_job == 'THF' then
-		windower.send_command('autows use rudra\'s storm')
-		windower.send_command('autows hp > 0 < 99')
-		windower.send_command('autows on')
-	elseif currentPC.main_job == 'NIN' then
-		windower.send_command('autows use Blade: Ten')
-		windower.send_command('autows hp > 0 < 99')
-		windower.send_command('autows on')
-	elseif currentPC.main_job == 'SAM' then
-		windower.send_command('hb buff ' .. currentPC.name .. ' hasso')
-		windower.send_command('autows use Tachi: Fudo')
-		windower.send_command('autows hp > 0 < 99')
-		windower.send_command('autows on')
-	elseif currentPC.main_job == 'MNK' then
-		windower.send_command('autows use Victory Smite')
-		windower.send_command('autows hp > 0 < 99')
-		windower.send_command('autows on')
-	elseif currentPC.main_job == 'DRG' then
-		windower.send_command('autows use Stardiver')
-		windower.send_command('autows hp > 0 < 99')
-		windower.send_command('autows on')
-	elseif currentPC.main_job == 'BLU' then
-		windower.send_command('autows use Chant Du Cygne')
-		windower.send_command('autows hp > 0 < 99')
-		windower.send_command('autows on')
-	end
-	
-	-- Sub job abilities
-	if currentPC.sub_job == 'WAR' then
-		windower.send_command('hb buff ' .. currentPC.name .. ' berserk')
-		windower.send_command('hb buff ' .. currentPC.name .. ' aggressor')
-	elseif currentPC.sub_job == 'SAM' then
-		windower.send_command('hb buff ' .. currentPC.name .. ' hasso')
-	end
-	
-	ipcflag = false
-
-end
-
-
 local function get_delay()
     local self = windower.ffxi.get_player().name
     local members = {}
@@ -338,11 +245,6 @@ windower.register_event('ipc message', function(msg)
 		coroutine.sleep(delay)
 		ipcflag = true
 		followon(cmd2)
-	elseif cmd == 'loadquetz' then
-		log('IPC Loading QUETZ addon stuff.')
-		coroutine.sleep(delay)
-		ipcflag = true
-		loadquetz(cmd2)
 	elseif cmd == 'refresh' then
 		log('IPC Refresh healbot')
 		coroutine.sleep(delay)
