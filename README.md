@@ -14,7 +14,7 @@ ON:  Toggles all addons that are defined under ON function such as healbot/autog
 
 OFF:  Toggles all addons to turn off.
 
-Loadquetz:  Loads custom addon/commands for farming Quetz (See Quetz repository)
+D2:  Will D2 all members of current party, will rest for MP if low on MP.
 
 fon:  Toggles healbot's follow on function, will follow to the current player executing this command.
 
