@@ -37,6 +37,8 @@ end)
 windower.register_event('addon command', function(input, ...)
     local cmd = string.lower(input)
 	local args = {...}
+	local cmd2 = args[1]
+	
 	
 	if cmd == 'on' then
 		on()
@@ -56,8 +58,12 @@ windower.register_event('addon command', function(input, ...)
 		dismount()
 	elseif cmd == 'refresh' then
 		refresh()
+	elseif cmd == 'reload' then
+		reload(cmd2)
 	elseif cmd == 'd2' then
 		d2()
+	elseif cmd == 'unload' then
+		unload(cmd2)
     end
 end)
 
@@ -70,6 +76,28 @@ function refresh()
 	if ipcflag == false then
 		ipcflag = true
 		windower.send_ipc_message('refresh')
+	end
+	ipcflag = false
+end
+
+function unload(addonarg)
+
+	log('Unloading Specific ADDON')
+	windower.send_command('lua u ' ..addonarg)
+	if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('unload ' ..addonarg)
+	end
+	ipcflag = false
+end
+
+function reload(addonarg)
+
+	log('Reload Specific ADDON')
+	windower.send_command('lua r ' ..addonarg)
+	if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('reload ' ..addonarg)
 	end
 	ipcflag = false
 end
@@ -382,6 +410,17 @@ windower.register_event('ipc message', function(msg)
 		coroutine.sleep(delay)
 		ipcflag = true
 		refresh()
+	elseif cmd == 'reload' then
+		log('IPC Reload ADDON ' ..cmd2)
+		coroutine.sleep(delay)
+		ipcflag = true
+		reload(cmd2)
+	elseif cmd == 'unload' then
+		log('IPC Unload ADDON ' ..cmd2)
+		coroutine.sleep(delay)
+		ipcflag = true
+		unload(cmd2)
 	end
+	
 	
 end)
