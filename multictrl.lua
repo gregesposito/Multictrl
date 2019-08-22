@@ -64,9 +64,30 @@ windower.register_event('addon command', function(input, ...)
 		d2()
 	elseif cmd == 'unload' then
 		unload(cmd2)
+	elseif cmd == 'assist' then
+		assist()
+	elseif cmd == 'trib' then
+		trib()
+	elseif cmd == 'rads' then
+		rads()
     end
 end)
 
+
+function assist(namearg)
+	log('Assist attack')
+
+	if ipcflag == false then
+		windower.send_command('hb assist off')
+		windower.send_command('hb assist attack off')
+		windower.send_ipc_message('assist ' .. currentPC.name)
+	elseif ipcflag == true then
+		windower.send_command('hb assist ' .. namearg)
+		windower.send_command('wait 1; hb assist attack on')
+	end
+	ipcflag = false
+	
+end
 
 function refresh()
 
@@ -339,6 +360,25 @@ function followoff()
 	ipcflag = false
 end
 
+function trib()
+	log('Getting Tribulens')
+	windower.send_command('escha trib')
+	if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('trib')
+	end
+	ipcflag = false
+end
+
+function rads()
+	log('Getting Radialens')
+	windower.send_command('escha rads')
+	if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('rads')
+	end
+	ipcflag = false
+end
 
 
 local function get_delay()
@@ -375,6 +415,11 @@ windower.register_event('ipc message', function(msg)
 		coroutine.sleep(delay)
 		ipcflag = true
 		dismount()
+	elseif cmd == 'assist' then
+		log('IPC Assist ON')
+		coroutine.sleep(delay)
+		ipcflag = true
+		assist(cmd2)
 	elseif cmd == 'warp' then
 		log('IPC Warp')
 		coroutine.sleep(delay)
@@ -420,6 +465,16 @@ windower.register_event('ipc message', function(msg)
 		coroutine.sleep(delay)
 		ipcflag = true
 		unload(cmd2)
+	elseif cmd == 'trib' then
+		log('IPC Getting Tribulens')
+		coroutine.sleep(delay)
+		ipcflag = true
+		trib()
+	elseif cmd == 'rads' then
+		log('IPC Getting Radialens')
+		coroutine.sleep(delay)
+		ipcflag = true
+		rads()
 	end
 	
 	
