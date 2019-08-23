@@ -70,6 +70,8 @@ windower.register_event('addon command', function(input, ...)
 		trib()
 	elseif cmd == 'rads' then
 		rads()
+	elseif cmd == 'vorseal' then
+		vorseal()	
     end
 end)
 
@@ -89,14 +91,15 @@ function assist(namearg)
 	
 end
 
-function refresh()
+function reset()
 
-	log('Reloading addons')
+	log('Reloading gearswap and healbot')
 	windower.send_command('lua r healbot')
+	windower.send_command('lua r gearswap')
 	windower.send_command('gs enable all')
 	if ipcflag == false then
 		ipcflag = true
-		windower.send_ipc_message('refresh')
+		windower.send_ipc_message('reset')
 	end
 	ipcflag = false
 end
@@ -380,6 +383,21 @@ function rads()
 	ipcflag = false
 end
 
+function rads()
+	log('Getting Elvorseal')
+	windower.send_command('escha vorseal')
+	if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('vorseal')
+	end
+	ipcflag = false
+end
+
+
+
+---------------------------------
+--Helper functions--
+---------------------------------
 
 local function get_delay()
     local self = windower.ffxi.get_player().name
@@ -450,11 +468,11 @@ windower.register_event('ipc message', function(msg)
 		coroutine.sleep(delay)
 		ipcflag = true
 		followon(cmd2)
-	elseif cmd == 'refresh' then
-		log('IPC Refresh healbot')
+	elseif cmd == 'reset' then
+		log('IPC reset gearswap and healbot')
 		coroutine.sleep(delay)
 		ipcflag = true
-		refresh()
+		reset()
 	elseif cmd == 'reload' then
 		log('IPC Reload ADDON ' ..cmd2)
 		coroutine.sleep(delay)
@@ -475,6 +493,11 @@ windower.register_event('ipc message', function(msg)
 		coroutine.sleep(delay)
 		ipcflag = true
 		rads()
+	elseif cmd == 'vorseal' then
+		log('IPC Getting Elvorseal')
+		coroutine.sleep(delay)
+		ipcflag = true
+		vorseal()
 	end
 	
 	
