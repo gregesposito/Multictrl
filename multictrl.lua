@@ -72,6 +72,8 @@ windower.register_event('addon command', function(input, ...)
 		rads()
 	elseif cmd == 'vorseal' then
 		vorseal()	
+	elseif cmd == 'buyalltemps' then
+		buyalltemps()	
     end
 end)
 
@@ -393,6 +395,15 @@ function vorseal()
 	ipcflag = false
 end
 
+function buyalltemps()
+	log('Getting ALL TEMPS!')
+	windower.send_command('escha buyall')
+	if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('buyalltemps')
+	end
+	ipcflag = false
+end
 
 
 ---------------------------------
@@ -498,6 +509,11 @@ windower.register_event('ipc message', function(msg)
 		coroutine.sleep(delay)
 		ipcflag = true
 		vorseal()
+	elseif cmd == 'buyalltemps' then
+		log('IPC TEMPS!')
+		coroutine.sleep(delay)
+		ipcflag = true
+		buyalltemps()
 	end
 	
 	
