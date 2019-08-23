@@ -383,7 +383,7 @@ function rads()
 	ipcflag = false
 end
 
-function rads()
+function vorseal()
 	log('Getting Elvorseal')
 	windower.send_command('escha vorseal')
 	if ipcflag == false then
