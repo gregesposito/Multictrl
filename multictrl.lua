@@ -373,7 +373,8 @@ end
 
 function followon(namearg)
 	log('Follow ON')
-
+	currentPC=windower.ffxi.get_player()
+	
 	if ipcflag == false then
 		--ipcflag = true
 		windower.send_command('hb follow off')
