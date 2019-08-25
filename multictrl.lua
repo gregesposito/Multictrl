@@ -73,10 +73,41 @@ windower.register_event('addon command', function(input, ...)
 	elseif cmd == 'vorseal' then
 		vorseal()	
 	elseif cmd == 'buyalltemps' then
-		buyalltemps()	
+		buyalltemps()
+	elseif cmd == 'smnburn' then
+		smnburn()
     end
 end)
 
+function smnburn()
+	log('SMN Burn Activated!')
+	player = windower.ffxi.get_player()
+	if player.main_job == 'SMN' then
+		log('SMN main job')
+		if ipcflag == false then
+			ipcflag = true
+			windower.send_ipc_message('smnburn')
+		end
+		ipcflag = false
+		-- check distance 21 or less
+		windower.send_command('input /ja "Astral Flow" <me>')
+		coroutine.sleep(2.5)
+		windower.send_command('input /ja "Assault" <t>')
+		coroutine.sleep(4)
+		windower.send_command('input /ja "Astral Conduit" <me>')
+		coroutine.sleep(1)
+		windower.send_command('exec VoltStrike.txt')
+	else
+		log('Not SMN job, skipping')
+		if ipcflag == false then
+			ipcflag = true
+			windower.send_ipc_message('smnburn')
+		end
+		ipcflag = false
+	end
+	
+	
+end
 
 function assist(namearg)
 	log('Assist attack')
@@ -514,6 +545,10 @@ windower.register_event('ipc message', function(msg)
 		coroutine.sleep(delay)
 		ipcflag = true
 		buyalltemps()
+	elseif cmd == 'smnburn' then
+		log('IPC SMN Burn 1hr')
+		ipcflag = true
+		smnburn()
 	end
 	
 	
