@@ -166,9 +166,9 @@ function burnset(cmd2,cmd3,cmd4)
 						else
 							log('Initialize HB and assist, and disabled cures')
 							if string.lower(v.name) == string.lower(player.name) then
-								windower.send_command('hb reload; wait 1.5; hb disable cure;')
+								windower.send_command('hb reload; wait 1.5; hb disable cure; hb disable na')
 							else
-								windower.send_command('hb reload; wait 1.5; hb disable cure; hb assist ' ..settings.assist .. ' wait 1.0; hb on')
+								windower.send_command('hb reload; wait 1.5; hb disable cure; hb disable na; hb assist ' ..settings.assist .. ' wait 1.0; hb on')
 							end
 						end
 					end
@@ -328,6 +328,7 @@ function geoburn()
 				windower.send_command('hb debuff rm dia II')
 			end
 			windower.send_command('hb disable cure')
+			windower.send_command('hb disable na')
 			windower.send_command('hb on')
 			if ipcflag == false then
 				ipcflag = true
@@ -351,7 +352,9 @@ function geoburn()
 			windower.send_command('input /ja "Dematerialize" <me>')
 			coroutine.sleep(0.75)
 			windower.send_command('hb enable cure')
+			windower.send_command('hb enable na')
 			windower.send_command('hb mincure 3')
+			windower.send_command('geo on')
 
 		else
 			log('Not GEO job, skipping')
