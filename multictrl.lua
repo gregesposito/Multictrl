@@ -53,6 +53,13 @@ windower.register_event('addon command', function(input, ...)
 	local cmd3 = args[2]
 	local cmd4 = args[3]
 	
+	local term = table.concat({...}, ' ')
+
+    term = term:gsub('<(%a+)id>', function(target_string)
+        local entity = windower.ffxi.get_mob_by_target(target_string)
+        return entity and entity.id or '<' .. target_string .. 'id>'
+    end)
+	
 	
 	
 	if cmd == 'on' then
@@ -95,10 +102,25 @@ windower.register_event('addon command', function(input, ...)
 		geoburn()
 	elseif cmd == 'burn' then
 		burnset(cmd2,cmd3,cmd4)
+	elseif cmd == 'send' then
+		send(term)
+
     end
 	
 end)
 
+function send(commands)
+	
+	if ipcflag == false then
+		log('Sending all chars \"' .. commands .. '\"')
+		ipcflag = true
+		windower.send_command(commands)
+		windower.send_ipc_message('send ' .. commands)
+	elseif ipcflag == true then
+		windower.send_command(commands)
+	end
+	ipcflag = false
+end
 
 
 function burnset(cmd2,cmd3,cmd4)
@@ -771,8 +793,8 @@ local function get_delay()
     end
 end
 
-
-windower.register_event('ipc message', function(msg) 
+-- function(input, ...)
+windower.register_event('ipc message', function(msg, ...) 
 	local args = msg:split(' ')
 	local cmd = args[1]
 	local cmd2 = args[2]
@@ -780,6 +802,12 @@ windower.register_event('ipc message', function(msg)
 	local cmd4 = args[4]
 	args:remove(1)
 	local delay = get_delay()
+	
+		
+	local term = msg:split(' ')
+	term:remove(1)
+	local send_cmd = table.concat(term, " ")
+			
 	
 	if cmd == 'mount' then
 		log('IPC Mount')
@@ -880,6 +908,11 @@ windower.register_event('ipc message', function(msg)
 		log('IPC Burn Settings')
 		ipcflag = true
 		burnset(cmd2, cmd3, cmd4)
+	elseif cmd == 'send' then
+		log('IPC Send: ' .. send_cmd)
+		coroutine.sleep(delay)
+		ipcflag = true
+		send(send_cmd)
 	end
 	
 	
