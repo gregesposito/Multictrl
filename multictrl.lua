@@ -187,11 +187,27 @@ function burnset(cmd2,cmd3,cmd4)
 						
 						else
 							log('Initialize HB and assist, and disabled cures')
-							if string.lower(v.name) == string.lower(player.name) then
-								windower.send_command('hb reload; wait 1.5; hb disable cure; hb disable na')
-							else
-								windower.send_command('hb reload; wait 1.5; hb disable cure; hb disable na; hb assist ' ..settings.assist .. ' wait 1.0; hb on')
-							end
+							-- if string.lower(v.name) == string.lower(player.name) then
+								-- windower.send_command('hb reload; wait 1.5; hb disable cure; hb disable na')
+							-- else
+								if player.main_job ~= 'WHM' and player.main_job ~= 'RUN' then
+									windower.send_command('hb reload; wait 1.5; hb disable cure; hb disable na; hb assist ' ..settings.assist .. ' wait 1.0; hb on')
+								end
+								-- Favor
+								if player.main_job == 'SMN' then
+									windower.send_command('input /ja "Avatar\'s Favor" <me>')
+								end
+								if player.main_job == 'GEO' then
+									windower.send_command('lua r autogeo; wait 1.5; geo geo frailty')
+									if settings.indi == 'torpor' then
+										windower.send_command('geo indi torpor')
+									elseif settings.indi == 'malaise' then
+										windower.send_command('geo indi malaise')
+									elseif settings.indi == 'refresh' then
+										windower.send_command('geo indi refresh')
+									end
+								end
+							--end
 						end
 					end
 				end
@@ -344,11 +360,7 @@ function geoburn()
 		log('GEO Burn Activated for Bolster!')
 		if player.main_job == 'GEO' then
 			log('GEO main job')
-			if settings.dia then
-				windower.send_command('hb debuff dia II')
-			elseif not settings.dia then
-				windower.send_command('hb debuff rm dia II')
-			end
+			windower.send_command('geo off')
 			windower.send_command('hb disable cure')
 			windower.send_command('hb disable na')
 			windower.send_command('hb on')
@@ -367,12 +379,17 @@ function geoburn()
 				windower.send_command('input /ma "Indi-Torpor" <me>')
 			elseif settings.indi == 'malaise' then
 				windower.send_command('input /ma "Indi-Malaise" <me>')
-			elseif settings.indti == 'refresh' then
+			elseif settings.indi == 'refresh' then
 				windower.send_command('input /ma "Indi-Refresh" <me>')
 			end
 			coroutine.sleep(4.5)
 			windower.send_command('input /ja "Dematerialize" <me>')
 			coroutine.sleep(0.75)
+			if settings.dia then
+				windower.send_command('hb debuff dia II')
+			elseif not settings.dia then
+				windower.send_command('hb debuff rm dia II')
+			end
 			windower.send_command('hb enable cure')
 			windower.send_command('hb enable na')
 			windower.send_command('hb mincure 3')
@@ -486,12 +503,18 @@ end
 function reload(addonarg)
 
 	log('Reload Specific ADDON')
-	windower.send_command('lua r ' ..addonarg)
-	if ipcflag == false then
-		ipcflag = true
-		windower.send_ipc_message('reload ' ..addonarg)
+	if addonarg == 'multictrl' then
+		log('Not supported')
+	else
+		
+		if ipcflag == false then
+			ipcflag = true
+			windower.send_ipc_message('reload ' ..addonarg)
+		end
+		coroutine.sleep(1.2)
+		windower.send_command('lua r ' ..addonarg)
+		ipcflag = false
 	end
-	ipcflag = false
 end
 
 function d2()
