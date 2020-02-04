@@ -20,6 +20,7 @@ default = {
 	dia=false,
 	active=false,
 	assist='',
+	helper=false,
 }
 
 
@@ -104,10 +105,108 @@ windower.register_event('addon command', function(input, ...)
 		burnset(cmd2,cmd3,cmd4)
 	elseif cmd == 'send' then
 		send(term)
-
+	elseif cmd == 'smnhelp' then
+		smnhelp(cmd2)
     end
 	
 end)
+
+function smnhelp(cmd2)
+
+	player = windower.ffxi.get_player()
+	if cmd2 == 'on' then
+		log('Helper for SMN BPing ACTIVE')
+		settings.helper = true
+		if ipcflag == false then
+			ipcflag = true
+			windower.send_ipc_message('smnhelp on')
+		end
+	elseif cmd2 == 'off' then
+		log('Helper for SMN BPing DISABLED')
+		settings.helper = false
+			if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('smnhelp off')
+		end
+	end
+	if settings.helper then
+		if player.main_job == 'SMN' then
+
+			if cmd2 == 'assault' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp assault')
+				else
+					windower.send_command('input /ja "Assault" <t>')
+				end
+				ipcflag = false
+			elseif cmd2 == 'release' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp release')
+				else
+					windower.send_command('input /ja "Release" <me>')
+				end
+				ipcflag = false
+			elseif cmd2 == 'retreat' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp retreat')
+				else
+					windower.send_command('input /ja "Retreat" <me>')
+				end
+				ipcflag = false
+			
+			elseif cmd2 == 'VS' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp VS')
+				else
+					windower.send_command('input /ja "Volt Strike" <t>')
+				end
+				ipcflag = false
+			
+			elseif cmd2 == 'FC' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp FC')
+				else
+					windower.send_command('input /ja "Flaming Crush" <t>')
+				end
+				ipcflag = false
+			
+			elseif cmd2 == 'ramuh' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp ramuh')
+				else
+					windower.send_command('input /ma "Ramuh" <me>')
+				end
+				ipcflag = false
+			
+			elseif cmd2 == 'ifrit' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp ifrit')
+				else
+					windower.send_command('input /ma "Ifrit" <me>')
+				end
+				ipcflag = false
+			elseif cmd2 == 'apogee' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp apogee')
+				else
+					windower.send_command('input /ja "Apogee" <me>')
+				end
+				ipcflag = false
+			end
+
+		end
+	end
+	
+end
+
 
 function send(commands)
 	
@@ -145,7 +244,12 @@ function burnset(cmd2,cmd3,cmd4)
 		
 	elseif cmd2 == 'on' then
 		settings.active = true
-		
+		windower.add_to_chat(123,'Usage:  	//mc burnset CMD Variable Variable \n\nCommands:\n')
+		windower.add_to_chat(123,'avatar: 	ramuh/ifrit')
+		windower.add_to_chat(123,'dia: 		on/off')
+		windower.add_to_chat(123,'indi: 	torpor/malaise')
+		windower.add_to_chat(123,'assist: 	name of character that is engaging mob')
+		windower.add_to_chat(123,'init: 	intializes commands to all chars, MUST RUN THIS AFTER setting variables')
 	elseif cmd2 == 'off' then
 		settings.active = false
 		
@@ -262,6 +366,7 @@ end
 function init_box_pos()
 
 	if burn_status then burn_status:destroy() end
+	if smn_help then smn_help:destroy() end
 
 	local settings = windower.get_windower_settings()
 	local x,y
@@ -271,6 +376,7 @@ function init_box_pos()
 	--else
 	x,y = settings["ui_x_res"]-505, 45 -- -285, -18
 	--end
+	sx,sy = settings["ui_x_res"]-435, 45
 
 	local font = displayfont or 'Arial'
 	local size = displaysize or 11
@@ -278,6 +384,16 @@ function init_box_pos()
 	local bg = displaybg or 0
 	local strokewidth = displaystroke or 2
 	local stroketransparancy = displaytransparancy or 192
+	
+	smn_help = texts.new()
+	smn_help:pos(sx,sy)
+    smn_help:font(font)--Arial
+    smn_help:size(size)
+    smn_help:bold(bold)
+    smn_help:bg_alpha(bg)--128
+    smn_help:right_justified(false)
+    smn_help:stroke_width(strokewidth)
+    smn_help:stroke_transparency(stroketransparancy)
 	
     burn_status = texts.new()
     burn_status:pos(x,y)
@@ -291,6 +407,8 @@ function init_box_pos()
 	
 
 	burn_status:pos(x,y)
+	
+	smn_help:pos(sx,sy)
 	
 	display_box()
 	--burn_status:show()
@@ -307,6 +425,15 @@ display_box = function()
     }
 	burn_status:clear()
 	burn_status:append(' ')
+	
+	smn_help:clear()
+	smn_help:append(' ')
+
+	if settings.smnhelp then
+		smn_help:append(string.format("%sSMN Helper: %sON", clr.w, clr.r))
+	else
+		smn_help:clear()
+	end
 
     if settings.active then
 		burn_status:append(string.format("%s1HR Burn: %sON", clr.w, clr.r))
@@ -345,7 +472,7 @@ display_box = function()
     end
 	
 
-
+	smn_help:show()
 	burn_status:show()
 end
 
@@ -936,6 +1063,11 @@ windower.register_event('ipc message', function(msg, ...)
 		coroutine.sleep(delay)
 		ipcflag = true
 		send(send_cmd)
+	elseif cmd == 'smnhelp' then
+		log('IPC SMNHelp')
+		coroutine.sleep(delay)
+		ipcflag = true
+		smnhelp(cmd2)
 	end
 	
 	
