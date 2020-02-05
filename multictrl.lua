@@ -20,7 +20,7 @@ default = {
 	dia=false,
 	active=false,
 	assist='',
-	helper=false,
+	smnhelp=false,
 }
 
 
@@ -111,101 +111,7 @@ windower.register_event('addon command', function(input, ...)
 	
 end)
 
-function smnhelp(cmd2)
 
-	player = windower.ffxi.get_player()
-	if cmd2 == 'on' then
-		log('Helper for SMN BPing ACTIVE')
-		settings.helper = true
-		if ipcflag == false then
-			ipcflag = true
-			windower.send_ipc_message('smnhelp on')
-		end
-	elseif cmd2 == 'off' then
-		log('Helper for SMN BPing DISABLED')
-		settings.helper = false
-			if ipcflag == false then
-		ipcflag = true
-		windower.send_ipc_message('smnhelp off')
-		end
-	end
-	if settings.helper then
-		if player.main_job == 'SMN' then
-
-			if cmd2 == 'assault' then
-				if ipcflag == false then
-					ipcflag = true
-					windower.send_ipc_message('smnhelp assault')
-				else
-					windower.send_command('input /ja "Assault" <t>')
-				end
-				ipcflag = false
-			elseif cmd2 == 'release' then
-				if ipcflag == false then
-					ipcflag = true
-					windower.send_ipc_message('smnhelp release')
-				else
-					windower.send_command('input /ja "Release" <me>')
-				end
-				ipcflag = false
-			elseif cmd2 == 'retreat' then
-				if ipcflag == false then
-					ipcflag = true
-					windower.send_ipc_message('smnhelp retreat')
-				else
-					windower.send_command('input /ja "Retreat" <me>')
-				end
-				ipcflag = false
-			
-			elseif cmd2 == 'VS' then
-				if ipcflag == false then
-					ipcflag = true
-					windower.send_ipc_message('smnhelp VS')
-				else
-					windower.send_command('input /ja "Volt Strike" <t>')
-				end
-				ipcflag = false
-			
-			elseif cmd2 == 'FC' then
-				if ipcflag == false then
-					ipcflag = true
-					windower.send_ipc_message('smnhelp FC')
-				else
-					windower.send_command('input /ja "Flaming Crush" <t>')
-				end
-				ipcflag = false
-			
-			elseif cmd2 == 'ramuh' then
-				if ipcflag == false then
-					ipcflag = true
-					windower.send_ipc_message('smnhelp ramuh')
-				else
-					windower.send_command('input /ma "Ramuh" <me>')
-				end
-				ipcflag = false
-			
-			elseif cmd2 == 'ifrit' then
-				if ipcflag == false then
-					ipcflag = true
-					windower.send_ipc_message('smnhelp ifrit')
-				else
-					windower.send_command('input /ma "Ifrit" <me>')
-				end
-				ipcflag = false
-			elseif cmd2 == 'apogee' then
-				if ipcflag == false then
-					ipcflag = true
-					windower.send_ipc_message('smnhelp apogee')
-				else
-					windower.send_command('input /ja "Apogee" <me>')
-				end
-				ipcflag = false
-			end
-
-		end
-	end
-	
-end
 
 
 function send(commands)
@@ -370,13 +276,14 @@ function init_box_pos()
 
 	local settings = windower.get_windower_settings()
 	local x,y
+	local sx,sy
 	
 	--if settings["ui_x_res"] == 1920 and settings["ui_y_res"] == 1080 then
 		--x,y = settings["ui_x_res"]-1917, settings["ui_y_res"]-18 -- -285, -18
 	--else
 	x,y = settings["ui_x_res"]-505, 45 -- -285, -18
 	--end
-	sx,sy = settings["ui_x_res"]-435, 45
+	sx,sy = settings["ui_x_res"]-620, 45
 
 	local font = displayfont or 'Arial'
 	local size = displaysize or 11
@@ -430,7 +337,7 @@ display_box = function()
 	smn_help:append(' ')
 
 	if settings.smnhelp then
-		smn_help:append(string.format("%sSMN Helper: %sON", clr.w, clr.r))
+		smn_help:append(string.format("%sSMN: %sON", clr.w, clr.r))
 	else
 		smn_help:clear()
 	end
@@ -476,7 +383,109 @@ display_box = function()
 	burn_status:show()
 end
 
-	
+function smnhelp(cmd2)
+
+	player = windower.ffxi.get_player()
+	if cmd2 == 'on' then
+		log('Helper for SMN BPing ACTIVE')
+		settings.smnhelp = true
+		if ipcflag == false then
+			ipcflag = true
+			windower.send_ipc_message('smnhelp on')
+		end
+	elseif cmd2 == 'off' then
+		log('Helper for SMN BPing DISABLED')
+		settings.smnhelp = false
+			if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('smnhelp off')
+		end
+	end
+	if settings.smnhelp then
+		if player.main_job == 'SMN' then
+
+			if cmd2 == 'assault' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp assault')
+				else
+					windower.send_command('input /ja "Assault" <t>')
+				end
+				ipcflag = false
+			elseif cmd2 == 'release' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp release')
+				else
+					windower.send_command('input /ja "Release" <me>')
+				end
+				ipcflag = false
+			elseif cmd2 == 'retreat' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp retreat')
+				else
+					windower.send_command('input /ja "Retreat" <me>')
+				end
+				ipcflag = false
+			
+			elseif cmd2 == 'VS' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp VS')
+				else
+					windower.send_command('input /ja "Volt Strike" <t>')
+				end
+				ipcflag = false
+			
+			elseif cmd2 == 'FC' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp FC')
+				else
+					windower.send_command('input /ja "Flaming Crush" <t>')
+				end
+				ipcflag = false
+			
+			elseif cmd2 == 'ramuh' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp ramuh')
+				else
+					windower.send_command('input /ma "Ramuh" <me>')
+				end
+				ipcflag = false
+			
+			elseif cmd2 == 'ifrit' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp ifrit')
+				else
+					windower.send_command('input /ma "Ifrit" <me>')
+				end
+				ipcflag = false
+			elseif cmd2 == 'apogee' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp apogee')
+				else
+					windower.send_command('input /ja "Apogee" <me>')
+				end
+				ipcflag = false
+			elseif cmd2 == 'thunderspark' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp thunderspark')
+				else
+					windower.send_command('input /ja "Thunderspark" <t>')
+				end
+				ipcflag = false
+			end
+
+		end
+	end
+	display_box()
+end	
 --burn_status = texts.new(display_box(),settings.text,settings)
 
 function geoburn()
