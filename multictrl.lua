@@ -5,6 +5,7 @@ _addon.commands = {'multi','mc'}
 
 require('functions')
 require('logger')
+require('tables')
 config = require('config')
 packets = require('packets')
 require('coroutine')
@@ -107,10 +108,32 @@ windower.register_event('addon command', function(input, ...)
 		send(term)
 	elseif cmd == 'smnhelp' then
 		smnhelp(cmd2)
+	elseif cmd == 'terror' then
+		terror()
+	elseif cmd == 'gettarget' then
+		gettarget()
     end
 	
 end)
 
+
+function gettarget()
+	log('Get Target')
+
+	quetzstring = tostring(windower.ffxi.get_mob_by_name('Kouryu').id)
+	windower.send_command('settarget ' .. quetzstring .. '')
+
+end
+
+function terror()
+	log('Using temp item: ANTI-TERROR!')
+	windower.send_command('input /item "Steadfast Tonic" <me>')
+	if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('terror')
+	end
+	ipcflag = false
+end
 
 
 
@@ -205,7 +228,11 @@ function burnset(cmd2,cmd3,cmd4)
 								end
 								-- Favor
 								if player.main_job == 'SMN' then
-									windower.send_command('input /ja "Avatar\'s Favor" <me>')
+									if settings.avatar == 'ramuh' then
+										windower.send_command('input /ma "Ramuh" <me>; wait 5; input /ja "Avatar\'s Favor" <me>')
+									elseif settings.avatar == 'ifrit' then
+										windower.send_command('input /ma "Ifrit" <me>; wait 5; input /ja "Avatar\'s Favor" <me>')
+									end
 								end
 								if player.main_job == 'GEO' then
 									windower.send_command('lua r autogeo; wait 1.5; geo geo frailty')
@@ -385,7 +412,6 @@ end
 
 function smnhelp(cmd2)
 
-	player = windower.ffxi.get_player()
 	if cmd2 == 'on' then
 		log('Helper for SMN BPing ACTIVE')
 		settings.smnhelp = true
@@ -393,16 +419,19 @@ function smnhelp(cmd2)
 			ipcflag = true
 			windower.send_ipc_message('smnhelp on')
 		end
+		ipcflag = false
 	elseif cmd2 == 'off' then
 		log('Helper for SMN BPing DISABLED')
 		settings.smnhelp = false
 			if ipcflag == false then
-		ipcflag = true
-		windower.send_ipc_message('smnhelp off')
+			ipcflag = true
+			windower.send_ipc_message('smnhelp off')
 		end
+		ipcflag = false
 	end
 	if settings.smnhelp then
-		if player.main_job == 'SMN' then
+		
+		if currentPC.main_job == 'SMN' then
 
 			if cmd2 == 'assault' then
 				if ipcflag == false then
@@ -478,6 +507,38 @@ function smnhelp(cmd2)
 					windower.send_ipc_message('smnhelp thunderspark')
 				else
 					windower.send_command('input /ja "Thunderspark" <t>')
+				end
+				ipcflag = false
+			elseif cmd2 == 'NB' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp NB')
+				else
+					windower.send_command('input /ja "Nether Blast" <t>')
+				end
+				ipcflag = false
+			elseif cmd2 == 'diabolos' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp diabolos')
+				else
+					windower.send_command('input /ma "Diabolos" <me>')
+				end
+				ipcflag = false
+			elseif cmd2 == 'super' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp super')
+				else
+					windower.send_command('input /item "Super Revitalizer" <me>')
+				end
+				ipcflag = false
+			elseif cmd2 == 'elixir' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp elixir')
+				else
+					windower.send_command('input /item "Lucid Elixir II" <me>; /item "Lucid Elixir I" <me>;')
 				end
 				ipcflag = false
 			end
@@ -1077,6 +1138,11 @@ windower.register_event('ipc message', function(msg, ...)
 		coroutine.sleep(delay)
 		ipcflag = true
 		smnhelp(cmd2)
+	elseif cmd == 'terror' then
+		log('IPC Terror!')
+		coroutine.sleep(delay)
+		ipcflag = true
+		terror()
 	end
 	
 	
