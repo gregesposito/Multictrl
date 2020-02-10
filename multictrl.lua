@@ -173,12 +173,15 @@ function burnset(cmd2,cmd3,cmd4)
 		
 	elseif cmd2 == 'on' then
 		settings.active = true
-		windower.add_to_chat(204,'Usage:  	//mc burnset CMD Variable Variable \n\nCommands:\n')
-		windower.add_to_chat(204,'avatar: 	ramuh/ifrit')
-		windower.add_to_chat(204,'dia: 		on/off')
-		windower.add_to_chat(204,'indi: 	torpor/malaise')
-		windower.add_to_chat(204,'assist: 	name of character that is engaging mob')
-		windower.add_to_chat(123,'init: 	*** Intializes commands to all chars, MUST RUN THIS AFTER setting variables. ***')
+		windower.add_to_chat(122,'Usage: //mc burn Command Variable \n')
+		windower.add_to_chat(122,'\ ')
+		windower.add_to_chat(122,'-Commands- \ \ \ -Variables- \n')
+		windower.add_to_chat(122,'\ ')
+		windower.add_to_chat(122,'\ avatar \ \ \ \ \ \ \ \ \ ramuh/ifrit')
+		windower.add_to_chat(122,'\ dia \ \ \ \ \ \ \ \ \ \ \ \ \ on/off')
+		windower.add_to_chat(122,'\ indi \ \ \ \ \ \ \ \ \ \ \ \ torpor/malaise')
+		windower.add_to_chat(122,'\ assist \ \ \ \ \ \ \ \ \ \ name of character that is engaging mob')
+		windower.add_to_chat(123,'\ init \ \ \ \ \ \ \ \ \ \ \ \ *** Intializes commands to all chars, MUST RUN THIS AFTER setting variables. ***')
 	elseif cmd2 == 'off' then
 		settings.active = false
 		
@@ -402,7 +405,8 @@ display_box = function()
 		
 		
     else
-		burn_status:append(string.format("%s1HR Burn: %sOFF", clr.w, clr.w))
+		burn_status:clear()
+		--burn_status:append(string.format("%s1HR Burn: %sOFF", clr.w, clr.w))
     end
 	
 
