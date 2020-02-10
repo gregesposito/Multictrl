@@ -538,17 +538,16 @@ function smnhelp(cmd2)
 					ipcflag = true
 					windower.send_ipc_message('smnhelp elixir')
 				else
-					windower.send_command('input /item "Lucid Elixir II" <me>; /item "Lucid Elixir I" <me>;')
+					windower.send_command('input /item "Lucid Elixir II" <me>')
+					windower.send_command('input /item "Lucid Elixir I" <me>')
 				end
 				ipcflag = false
 			end
 		else
 			if ipcflag == false then
 				ipcflag = true
-			else
-				ipcflag = false
 			end
-		
+			ipcflag = false
 		end
 
 	end
