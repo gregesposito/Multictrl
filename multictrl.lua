@@ -542,8 +542,15 @@ function smnhelp(cmd2)
 				end
 				ipcflag = false
 			end
-
+		else
+			if ipcflag == false then
+				ipcflag = true
+			else
+				ipcflag = false
+			end
+		
 		end
+
 	end
 	display_box()
 end	
@@ -567,7 +574,7 @@ function geoburn()
 			end
 			ipcflag = false
 			
-			coroutine.sleep(1.5)
+			coroutine.sleep(2.5)
 			windower.send_command('input /ja "Bolster" <me>')
 			coroutine.sleep(1.8)
 			windower.send_command('input /ma "Geo-Frailty" <t>')
