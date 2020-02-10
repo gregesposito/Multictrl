@@ -173,12 +173,12 @@ function burnset(cmd2,cmd3,cmd4)
 		
 	elseif cmd2 == 'on' then
 		settings.active = true
-		windower.add_to_chat(123,'Usage:  	//mc burnset CMD Variable Variable \n\nCommands:\n')
-		windower.add_to_chat(123,'avatar: 	ramuh/ifrit')
-		windower.add_to_chat(123,'dia: 		on/off')
-		windower.add_to_chat(123,'indi: 	torpor/malaise')
-		windower.add_to_chat(123,'assist: 	name of character that is engaging mob')
-		windower.add_to_chat(123,'init: 	intializes commands to all chars, MUST RUN THIS AFTER setting variables')
+		windower.add_to_chat(204,'Usage:  	//mc burnset CMD Variable Variable \n\nCommands:\n')
+		windower.add_to_chat(204,'avatar: 	ramuh/ifrit')
+		windower.add_to_chat(204,'dia: 		on/off')
+		windower.add_to_chat(204,'indi: 	torpor/malaise')
+		windower.add_to_chat(204,'assist: 	name of character that is engaging mob')
+		windower.add_to_chat(123,'init: 	*** Intializes commands to all chars, MUST RUN THIS AFTER setting variables. ***')
 	elseif cmd2 == 'off' then
 		settings.active = false
 		
@@ -412,22 +412,24 @@ end
 
 function smnhelp(cmd2)
 
-	if cmd2 == 'on' then
-		log('Helper for SMN BPing ACTIVE')
-		settings.smnhelp = true
-		if ipcflag == false then
-			ipcflag = true
-			windower.send_ipc_message('smnhelp on')
-		end
-		ipcflag = false
-	elseif cmd2 == 'off' then
-		log('Helper for SMN BPing DISABLED')
-		settings.smnhelp = false
+	if cmd2 == nil then
+		if settings.smnhelp then
+			log('Helper for SMN BPing DISABLED')
+			settings.smnhelp = false
+				if ipcflag == false then
+				ipcflag = true
+				windower.send_ipc_message('smnhelp')
+			end
+			ipcflag = false
+		else
+			log('Helper for SMN BPing ACTIVE')
+			settings.smnhelp = true
 			if ipcflag == false then
-			ipcflag = true
-			windower.send_ipc_message('smnhelp off')
+				ipcflag = true
+				windower.send_ipc_message('smnhelp')
+			end
+			ipcflag = false
 		end
-		ipcflag = false
 	end
 	if settings.smnhelp then
 		
