@@ -163,6 +163,8 @@ function burnset(cmd2,cmd3,cmd4)
 			elseif cmd3:lower() == 'ifrit' then
 				settings.avatar = 'ifrit'
 				--settings.save()
+			elseif cmd3:lower() == 'siren' then
+				settings.avatar = 'siren'
 				
 			else
 				log('Invalid Avatar choice')
@@ -235,6 +237,8 @@ function burnset(cmd2,cmd3,cmd4)
 										windower.send_command('input /ma "Ramuh" <me>; wait 5; input /ja "Avatar\'s Favor" <me>')
 									elseif settings.avatar == 'ifrit' then
 										windower.send_command('input /ma "Ifrit" <me>; wait 5; input /ja "Avatar\'s Favor" <me>')
+									elseif settings.avatar == 'siren' then
+										windower.send_command('input /ma "Siren" <me>; wait 5; input /ja "Avatar\'s Favor" <me>')
 									end
 								end
 								if player.main_job == 'GEO' then
@@ -380,6 +384,9 @@ display_box = function()
 			
 		elseif settings.avatar == 'ifrit' then
 			burn_status:append(string.format("\n%s Avatar: %s" .. settings.avatar, clr.w, clr.h))
+			
+		elseif settings.avatar == 'siren' then
+			burn_status:append(string.format("\n%s Avatar: %s" .. settings.avatar, clr.w, clr.h))
 		end
 		
 		
@@ -481,6 +488,15 @@ function smnhelp(cmd2)
 					windower.send_command('input /ja "Flaming Crush" <t>')
 				end
 				ipcflag = false
+				
+			elseif cmd2 == 'HA' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp HA')
+				else
+					windower.send_command('input /ja "Hysteric Assault" <t>')
+				end
+				ipcflag = false
 			
 			elseif cmd2 == 'ramuh' then
 				if ipcflag == false then
@@ -499,6 +515,16 @@ function smnhelp(cmd2)
 					windower.send_command('input /ma "Ifrit" <me>')
 				end
 				ipcflag = false
+				
+			elseif cmd2 == 'siren' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp siren')
+				else
+					windower.send_command('input /ma "Siren" <me>')
+				end
+				ipcflag = false	
+				
 			elseif cmd2 == 'apogee' then
 				if ipcflag == false then
 					ipcflag = true
@@ -579,7 +605,7 @@ function geoburn()
 			end
 			ipcflag = false
 			
-			coroutine.sleep(2.5)
+			coroutine.sleep(1.7)
 			windower.send_command('input /ja "Bolster" <me>')
 			coroutine.sleep(1.8)
 			windower.send_command('input /ma "Geo-Frailty" <t>')
@@ -632,7 +658,7 @@ function smnburn()
 			end
 			ipcflag = false
 			-- check distance 21 or less
-			coroutine.sleep(1.2)
+			coroutine.sleep(1.5)
 			windower.send_command('input /ja "Astral Flow" <me>')
 			coroutine.sleep(2.5)
 			windower.send_command('input /ja "Assault" <t>')
@@ -643,6 +669,8 @@ function smnburn()
 				windower.send_command('exec VoltStrike.txt')
 			elseif settings.avatar == 'ifrit' then
 				windower.send_command('exec FlamingCrush.txt')
+			elseif settings.avatar == 'siren' then
+				windower.send_command('exec HystericAssault.txt')
 			end
 		else
 			log('Not SMN job, skipping')
@@ -664,6 +692,7 @@ function assist(cmd,namearg)
 	
 		if ipcflag == false then
 			log('Assist Leader!')
+			ipcflag = true
 			windower.send_command('hb assist off')
 			windower.send_command('hb assist attack off')
 			windower.send_ipc_message('assist on ' .. currentPC.name)
@@ -675,6 +704,7 @@ function assist(cmd,namearg)
 		end
 	elseif cmd == 'off' then
 		if ipcflag == false then
+			ipcflag = true
 			windower.send_command('hb assist off; hb assist attack off')
 			windower.send_ipc_message('assist off')
 		elseif ipcflag == true then
