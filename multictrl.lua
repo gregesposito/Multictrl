@@ -76,9 +76,9 @@ windower.register_event('addon command', function(input, ...)
 		warp()
 	elseif cmd == 'omen' then
 		omen()
-	elseif cmd == 'mount' then
+	elseif cmd == 'mnt' then
 		mount()
-	elseif cmd == 'dismount' then
+	elseif cmd == 'dis' then
 		dismount()
 	elseif cmd == 'reset' then
 		reset()
@@ -108,14 +108,77 @@ windower.register_event('addon command', function(input, ...)
 		send(term)
 	elseif cmd == 'smnhelp' then
 		smnhelp(cmd2)
+	elseif cmd == 'buff' then
+		buff()
 	elseif cmd == 'terror' then
 		terror()
 	elseif cmd == 'gettarget' then
 		gettarget()
+	elseif cmd == 'restart' then
+		restart()
+	elseif cmd == 'random' then
+		disperse()
+	elseif cmd == 'fight' then
+		fight()
     end
 	
 end)
 
+
+function restart()
+	windower.send_command('send@all lua r multictrl')
+end
+
+function fight()
+
+	if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('fight')
+	elseif ipcflag == true then
+		local player_job = windower.ffxi.get_player()
+		if player_job.main_job == "WHM" then
+			windower.send_command('hb f dist 18')
+		elseif player_job.main_job == "GEO" or player_job.main_job == "BRD" then
+			windower.send_command('hb f dist 5')
+		elseif player_job.main_job == "SMN" then
+			windower.send_command('hb f dist 19')
+		else
+			windower.send_command('hb f dist 7')
+		end
+	end
+	ipcflag = false
+end
+
+
+function disperse()
+
+	if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('random')
+	elseif ipcflag == true then
+		local turn = math.random(-3.5,3.2)
+		local running = math.random(0.9,1.0)
+		windower.ffxi.turn(turn)
+		coroutine.sleep(0.5)
+		windower.ffxi.run(true)
+		coroutine.sleep(running)
+		windower.ffxi.run(false)
+	end
+	ipcflag = false
+end
+
+function buff()
+	log('Buffing Up!')
+	local player_job = windower.ffxi.get_player()
+	if player_job.main_job == "WHM" or player_job.main_job == "GEO" or player_job.main_job == "BRD" or player_job.main_job == "SMN" then
+		windower.send_command('gs c buffup')
+	end
+	if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('buff')
+	end
+	ipcflag = false
+end
 
 function gettarget()
 	log('Get Target')
@@ -242,7 +305,7 @@ function burnset(cmd2,cmd3,cmd4)
 									end
 								end
 								if player.main_job == 'GEO' then
-									windower.send_command('lua r autogeo; wait 1.5; geo geo frailty')
+									windower.send_command('lua r autogeo; wait 1.0; geo off; wait 1.5; geo geo frailty')
 									if settings.indi == 'torpor' then
 										windower.send_command('geo indi torpor')
 									elseif settings.indi == 'malaise' then
@@ -912,8 +975,8 @@ end
 
 function mount()
 
-	log('Mounting Red Crab')
-	windower.send_command('input /mount \'Red Crab\'')
+	log('Mounting')
+	windower.send_command('input /mount \'Warmachine\'')
 	if ipcflag == false then
 		ipcflag = true
 		windower.send_ipc_message('mount')
@@ -943,8 +1006,14 @@ end
 
 function on()
 	log('Turning on addon stuff...')
+	local player_job = windower.ffxi.get_player()
+	if player_job.main_job == "GEO" then
+		windower.send_command('geo on')
+		windower.send_command('gs c set autobuffmode auto')
+	elseif player_job.main_job == "RUN" then
+		windower.send_command('gs c set autorunemode on')
+	end
 	windower.send_command('hb on')
-	windower.send_command('geo on')
 	windower.send_command('roller on')
 	windower.send_command('singer on')
 	--windower.send_command('gs c toggle AutoTankMode')
@@ -957,8 +1026,15 @@ end
 
 function off()
 	log('Turning off addon stuff...')
+	local player_job = windower.ffxi.get_player()
+	if player_job.main_job == "GEO" then
+		windower.send_command('geo on')
+		windower.send_command('gs c set autobuffmode off')
+	elseif player_job.main_job == "RUN" then
+		windower.send_command('gs c set autorunemode off')
+		windower.send_command('gs c set autotankmode off')
+	end
 	windower.send_command('hb off')
-	windower.send_command('geo off')
 	windower.send_command('roller off')
 	windower.send_command('singer off')
 	if ipcflag == false then
@@ -968,18 +1044,45 @@ function off()
 	ipcflag = false
 end
 
-function followon(namearg)
+function followon()
 	log('Follow ON')
 	currentPC=windower.ffxi.get_player()
 	
-	if ipcflag == false then
-		ipcflag = true
 		windower.send_command('hb follow off')
-		windower.send_ipc_message('followon ' .. currentPC.name)
-	elseif ipcflag == true then
-		windower.send_command('hb follow ' .. namearg)
-	end
-	ipcflag = false
+		windower.send_command('hb f dist 3')
+	
+		for k, v in pairs(windower.ffxi.get_party()) do
+			
+				if type(v) == 'table' then
+					if v.name ~= currentPC.name then
+					
+					--coroutine.sleep(1)
+					
+						ptymember = windower.ffxi.get_mob_by_name(v.name)
+						-- check if party member in same zone.
+
+						if v.mob == nil then
+							-- Not in zone.
+							log(v.name .. ' is not in zone, not following.')
+							windower.send_command('send ' .. v.name .. ' hb follow off')
+							windower.send_command('send ' .. v.name .. ' hb f dist 3')
+						else
+							windower.send_command('send ' .. v.name .. ' hb f dist 3')
+							windower.send_command('send ' .. v.name .. ' hb follow ' .. currentPC.name)
+						end
+					end
+				end
+		end
+	
+	
+	-- if ipcflag == false then
+		-- ipcflag = true
+		-- windower.send_command('hb follow off')
+		-- windower.send_ipc_message('followon ' .. currentPC.name)
+	-- elseif ipcflag == true then
+		-- windower.send_command('hb follow ' .. namearg)
+	-- end
+	-- ipcflag = false
 	
 end
 
@@ -1015,13 +1118,58 @@ function rads()
 end
 
 function vorseal()
-	log('Getting Elvorseal')
-	windower.send_command('escha vorseal')
-	if ipcflag == false then
-		ipcflag = true
-		windower.send_ipc_message('vorseal')
-	end
-	ipcflag = false
+	-- log('Getting Elvorseal')
+	-- --windower.send_command('escha vorseal')
+	-- zone = windower.ffxi.get_info()['zone']
+	
+	-- if zone == 291 then
+		-- tp = windower.ffxi.get_mob_by_name('Shiftrix')
+		-- windower.send_command('settarget ' .. tp.id)
+		-- coroutine.sleep(1)
+		-- windower.send_command('input /lockon')
+		-- coroutine.sleep(1)	
+	-- elseif zone == 288 then
+		-- tp = windower.ffxi.get_mob_by_name('Affi')
+		-- windower.send_command('settarget ' .. tp.id)
+		-- coroutine.sleep(1)
+		-- windower.send_command('input /lockon')
+		-- coroutine.sleep(1)	
+	
+	-- elseif zone == 289 then
+		-- tp = windower.ffxi.get_mob_by_name('Dremi')
+		-- windower.send_command('settarget ' .. tp.id)
+		-- coroutine.sleep(1)
+		-- windower.send_command('input /lockon')
+		-- coroutine.sleep(1)	
+	
+	-- end
+	
+	-- coroutine.sleep(1)
+	-- windower.send_command('setkey enter down')
+	-- coroutine.sleep(.5)
+	-- windower.send_command('setkey enter up')
+	-- coroutine.sleep(6)
+	-- windower.send_command('setkey down down')
+	-- coroutine.sleep(.5)
+	-- windower.send_command('setkey down up')
+	-- coroutine.sleep(6)
+	-- windower.send_command('setkey enter down')
+	-- coroutine.sleep(.5)
+	-- windower.send_command('setkey enter up')
+	-- coroutine.sleep(3)
+	-- windower.send_command('setkey up down')
+	-- coroutine.sleep(.5)
+	-- windower.send_command('setkey up up')	
+	-- coroutine.sleep(3)
+	-- windower.send_command('setkey enter down')
+	-- coroutine.sleep(.5)
+	-- windower.send_command('setkey enter up')
+
+	-- if ipcflag == false then
+		-- ipcflag = true
+		-- windower.send_ipc_message('vorseal')
+	-- end
+	-- ipcflag = false
 end
 
 function buyalltemps()
@@ -1118,11 +1266,11 @@ windower.register_event('ipc message', function(msg, ...)
 		coroutine.sleep(delay)
 		ipcflag = true
 		followoff()
-	elseif cmd == 'followon' then
-		log('IPC Follow ON')
-		coroutine.sleep(delay)
-		ipcflag = true
-		followon(cmd2)
+	-- elseif cmd == 'followon' then
+		-- log('IPC Follow ON')
+		-- coroutine.sleep(delay)
+		-- ipcflag = true
+		-- followon(cmd2)
 	elseif cmd == 'reset' then
 		log('IPC reset gearswap and healbot')
 		coroutine.sleep(delay)
@@ -1140,12 +1288,16 @@ windower.register_event('ipc message', function(msg, ...)
 		unload(cmd2)
 	elseif cmd == 'trib' then
 		log('IPC Getting Tribulens')
-		coroutine.sleep(delay)
+		local moredelay = get_delay()
+		finaldelay = moredelay + delay
+		coroutine.sleep(finaldelay)
 		ipcflag = true
 		trib()
 	elseif cmd == 'rads' then
 		log('IPC Getting Radialens')
-		coroutine.sleep(delay)
+		local moredelay = get_delay()
+		finaldelay = moredelay + delay
+		coroutine.sleep(finaldelay)
 		ipcflag = true
 		rads()
 	elseif cmd == 'vorseal' then
@@ -1180,11 +1332,26 @@ windower.register_event('ipc message', function(msg, ...)
 		coroutine.sleep(delay)
 		ipcflag = true
 		smnhelp(cmd2)
+	elseif cmd == 'buff' then
+		log('IPC Buff')
+		coroutine.sleep(delay)
+		ipcflag = true
+		buff()
 	elseif cmd == 'terror' then
 		log('IPC Terror!')
 		coroutine.sleep(delay)
 		ipcflag = true
 		terror()
+	elseif cmd == 'random' then
+		log('IPC Random')
+		coroutine.sleep(delay)
+		ipcflag = true
+		disperse()
+	elseif cmd == 'fight' then
+		log('IPC Fight')
+		coroutine.sleep(delay)
+		ipcflag = true
+		fight()
 	end
 	
 	
