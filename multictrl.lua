@@ -485,6 +485,7 @@ display_box = function()
 end
 
 function smnhelp(cmd2)
+	currentPC=windower.ffxi.get_player()
 
 	if cmd2 == nil then
 		if settings.smnhelp then
