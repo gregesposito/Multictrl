@@ -12,8 +12,6 @@ require('coroutine')
 res = require('resources')
 texts = require('texts')
 
-
-
 default = {
 
 	avatar='ramuh',
@@ -94,8 +92,6 @@ windower.register_event('addon command', function(input, ...)
 		trib()
 	elseif cmd == 'rads' then
 		rads()
-	elseif cmd == 'vorseal' then
-		vorseal()	
 	elseif cmd == 'buyalltemps' then
 		buyalltemps()
 	elseif cmd == 'smnburn' then
@@ -113,40 +109,95 @@ windower.register_event('addon command', function(input, ...)
 	elseif cmd == 'terror' then
 		terror()
 	elseif cmd == 'gettarget' then
-		gettarget()
+		gettarget(cmd2)
 	elseif cmd == 'restart' then
 		restart()
-	elseif cmd == 'random' then
-		disperse()
 	elseif cmd == 'fight' then
 		fight()
 	elseif cmd == 'ein' then
-		ein()
+		ein(cmd2)
+	elseif cmd == 'htmb' then
+		htmb(cmd2)
     end
 	
 end)
 
+function htmb(cmd2)
+		if ipcflag == false then
+			ipcflag = true
+			windower.send_ipc_message('htmb enter')
+		elseif ipcflag == true then
+			windower.send_command('input /targetnpc; wait 2; setkey enter down; wait 0.5; setkey enter up; wait 10; setkey down down; wait 0.5; setkey down up; wait 2.5; setkey up down; wait 0.5; setkey up up; setkey enter down; wait 0.5; setkey enter up')
+		end
+		ipcflag = false
+end
 
 
-function ein()
-	windower.send_command('input /targetnpc; wait 1; input /item \'glowing lamp\' <t>; wait 3; setkey up down; wait 0.5; setkey up up; wait 1; setkey enter down; wait 0.5; setkey enter up')
-	coroutine.sleep(10)
-	if ipcflag == false then
-		ipcflag = true
-		windower.send_ipc_message('ein')
+function ein(cmd2)
+	
+	if (cmd2 == 'enter') then
+		windower.send_command('input /targetnpc; wait 2; input /item \'glowing lamp\' <t>; wait 3; setkey up down; wait 0.5; setkey up up; wait 1; setkey enter down; wait 0.5; setkey enter up')
+		coroutine.sleep(10)
+		if ipcflag == false then
+			ipcflag = true
+			windower.send_ipc_message('ein enter')
+		end
+		ipcflag = false
+	elseif (cmd2 == 'exit') then
+		local items = windower.ffxi.get_items()
+		local exitflag = false
+		for index, item in pairs(items.inventory) do
+			if type(item) == 'table' and item.id == 5414 then
+				log('Dropping lamp to exit!')
+				windower.ffxi.drop_item(index, item.count)
+				exitflag = true
+			end
+		end
+		if exitflag == false then
+			log('No lamp in inventory!')
+		end
+		if ipcflag == false then
+			ipcflag = true
+			windower.send_ipc_message('ein exit')
+		end
+		ipcflag = false
+	else
+		log('No sub command specified')
 	end
-	ipcflag = false
 end
 
 function restart()
 	windower.send_command('send @all lua r multictrl')
 end
 
+
+function gettarget(cmd2)
+	if (cmd2 ~= nil) then
+		log('Get Target: ' .. cmd2)
+		local targetid = tostring(windower.ffxi.get_mob_by_name(cmd2).id)
+		windower.send_command('settarget ' .. targetid .. '')
+	else
+		log('No target specified!')
+	end
+end
+
+function terror()
+	log('Using temp item: ANTI-TERROR!')
+	windower.send_command('input /item "Steadfast Tonic" <me>')
+	if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('terror')
+	end
+	ipcflag = false
+end
+
+
 function fight()
 
 	if ipcflag == false then
 		ipcflag = true
 		windower.send_ipc_message('fight')
+		log('Fight distnace')
 	elseif ipcflag == true then
 		local player_job = windower.ffxi.get_player()
 		if player_job.main_job == "WHM" then
@@ -163,23 +214,6 @@ function fight()
 end
 
 
-function disperse()
-
-	if ipcflag == false then
-		ipcflag = true
-		windower.send_ipc_message('random')
-	elseif ipcflag == true then
-		local turn = math.random(-3.5,3.2)
-		local running = math.random(0.9,1.0)
-		windower.ffxi.turn(turn)
-		coroutine.sleep(0.5)
-		windower.ffxi.run(true)
-		coroutine.sleep(running)
-		windower.ffxi.run(false)
-	end
-	ipcflag = false
-end
-
 function buff()
 	log('Buffing Up!')
 	local player_job = windower.ffxi.get_player()
@@ -189,24 +223,6 @@ function buff()
 	if ipcflag == false then
 		ipcflag = true
 		windower.send_ipc_message('buff')
-	end
-	ipcflag = false
-end
-
-function gettarget()
-	log('Get Target')
-
-	quetzstring = tostring(windower.ffxi.get_mob_by_name('Kouryu').id)
-	windower.send_command('settarget ' .. quetzstring .. '')
-
-end
-
-function terror()
-	log('Using temp item: ANTI-TERROR!')
-	windower.send_command('input /item "Steadfast Tonic" <me>')
-	if ipcflag == false then
-		ipcflag = true
-		windower.send_ipc_message('terror')
 	end
 	ipcflag = false
 end
@@ -1268,11 +1284,6 @@ windower.register_event('ipc message', function(msg, ...)
 		coroutine.sleep(finaldelay)
 		ipcflag = true
 		rads()
-	elseif cmd == 'vorseal' then
-		log('IPC Getting Elvorseal')
-		coroutine.sleep(delay)
-		ipcflag = true
-		vorseal()
 	elseif cmd == 'buyalltemps' then
 		log('IPC TEMPS!')
 		coroutine.sleep(delay)
@@ -1310,11 +1321,6 @@ windower.register_event('ipc message', function(msg, ...)
 		coroutine.sleep(delay)
 		ipcflag = true
 		terror()
-	elseif cmd == 'random' then
-		log('IPC Random')
-		coroutine.sleep(delay)
-		ipcflag = true
-		disperse()
 	elseif cmd == 'fight' then
 		log('IPC Fight')
 		coroutine.sleep(delay)
@@ -1324,7 +1330,12 @@ windower.register_event('ipc message', function(msg, ...)
 		log('IPC Ein')
 		coroutine.sleep(delay)
 		ipcflag = true
-		ein()
+		ein(cmd2)
+	elseif cmd == 'htmb' then
+		log('IPC HTMB')
+		coroutine.sleep(delay)
+		ipcflag = true
+		htmb(cmd2)	
 	end
 	
 	
