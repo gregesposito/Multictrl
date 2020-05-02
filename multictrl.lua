@@ -120,13 +120,26 @@ windower.register_event('addon command', function(input, ...)
 		disperse()
 	elseif cmd == 'fight' then
 		fight()
+	elseif cmd == 'ein' then
+		ein()
     end
 	
 end)
 
 
+
+function ein()
+	windower.send_command('input /targetnpc; wait 1; input /item \'glowing lamp\' <t>; wait 3; setkey up down; wait 0.5; setkey up up; wait 1; setkey enter down; wait 0.5; setkey enter up')
+	coroutine.sleep(10)
+	if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('ein')
+	end
+	ipcflag = false
+end
+
 function restart()
-	windower.send_command('send@all lua r multictrl')
+	windower.send_command('send @all lua r multictrl')
 end
 
 function fight()
@@ -140,7 +153,7 @@ function fight()
 			windower.send_command('hb f dist 18')
 		elseif player_job.main_job == "GEO" or player_job.main_job == "BRD" then
 			windower.send_command('hb f dist 5')
-		elseif player_job.main_job == "SMN" then
+		elseif player_job.main_job == "SMN" or player_job.main_job == "BLM" or player_job.main_job == "SCH" then
 			windower.send_command('hb f dist 19')
 		else
 			windower.send_command('hb f dist 7')
@@ -603,6 +616,14 @@ function smnhelp(cmd2)
 					windower.send_ipc_message('smnhelp thunderspark')
 				else
 					windower.send_command('input /ja "Thunderspark" <t>')
+				end
+				ipcflag = false
+			elseif cmd2 == 'thunderstorm' then
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp thunderstorm')
+				else
+					windower.send_command('input /ja "thunderstorm" <t>')
 				end
 				ipcflag = false
 			elseif cmd2 == 'NB' then
@@ -1118,60 +1139,6 @@ function rads()
 	ipcflag = false
 end
 
-function vorseal()
-	-- log('Getting Elvorseal')
-	-- --windower.send_command('escha vorseal')
-	-- zone = windower.ffxi.get_info()['zone']
-	
-	-- if zone == 291 then
-		-- tp = windower.ffxi.get_mob_by_name('Shiftrix')
-		-- windower.send_command('settarget ' .. tp.id)
-		-- coroutine.sleep(1)
-		-- windower.send_command('input /lockon')
-		-- coroutine.sleep(1)	
-	-- elseif zone == 288 then
-		-- tp = windower.ffxi.get_mob_by_name('Affi')
-		-- windower.send_command('settarget ' .. tp.id)
-		-- coroutine.sleep(1)
-		-- windower.send_command('input /lockon')
-		-- coroutine.sleep(1)	
-	
-	-- elseif zone == 289 then
-		-- tp = windower.ffxi.get_mob_by_name('Dremi')
-		-- windower.send_command('settarget ' .. tp.id)
-		-- coroutine.sleep(1)
-		-- windower.send_command('input /lockon')
-		-- coroutine.sleep(1)	
-	
-	-- end
-	
-	-- coroutine.sleep(1)
-	-- windower.send_command('setkey enter down')
-	-- coroutine.sleep(.5)
-	-- windower.send_command('setkey enter up')
-	-- coroutine.sleep(6)
-	-- windower.send_command('setkey down down')
-	-- coroutine.sleep(.5)
-	-- windower.send_command('setkey down up')
-	-- coroutine.sleep(6)
-	-- windower.send_command('setkey enter down')
-	-- coroutine.sleep(.5)
-	-- windower.send_command('setkey enter up')
-	-- coroutine.sleep(3)
-	-- windower.send_command('setkey up down')
-	-- coroutine.sleep(.5)
-	-- windower.send_command('setkey up up')	
-	-- coroutine.sleep(3)
-	-- windower.send_command('setkey enter down')
-	-- coroutine.sleep(.5)
-	-- windower.send_command('setkey enter up')
-
-	-- if ipcflag == false then
-		-- ipcflag = true
-		-- windower.send_ipc_message('vorseal')
-	-- end
-	-- ipcflag = false
-end
 
 function buyalltemps()
 	log('Getting ALL TEMPS!')
@@ -1353,6 +1320,11 @@ windower.register_event('ipc message', function(msg, ...)
 		coroutine.sleep(delay)
 		ipcflag = true
 		fight()
+	elseif cmd == 'ein' then
+		log('IPC Ein')
+		coroutine.sleep(delay)
+		ipcflag = true
+		ein()
 	end
 	
 	
