@@ -20,6 +20,7 @@ default = {
 	active=false,
 	assist='',
 	smnhelp=false,
+	buy=false,
 }
 
 
@@ -109,7 +110,7 @@ windower.register_event('addon command', function(input, ...)
 	elseif cmd == 'terror' then
 		terror()
 	elseif cmd == 'gettarget' then
-		gettarget(cmd2)
+		gettarget(term)
 	elseif cmd == 'restart' then
 		restart()
 	elseif cmd == 'fight' then
@@ -118,24 +119,86 @@ windower.register_event('addon command', function(input, ...)
 		ein(cmd2)
 	elseif cmd == 'htmb' then
 		htmb(cmd2)
+	elseif cmd == 'buy' then
+		buy(cmd2)
     end
 	
 end)
 
+function buy(cmd2)
+
+	if cmd2 == 'on' then
+		log('Turning on BUY function, loading addons')
+		settings.buy = true
+		windower.send_command('lua r powder; wait 1; lua r sparks; wait 1; lua r sellnpc')
+		if ipcflag == false then
+			ipcflag = true
+			windower.send_ipc_message('buy on')
+		end
+		ipcflag = false
+	elseif cmd2 == 'off' then
+		log('Shutting off BUY function, unloading addons')
+		settings.buy = false
+		windower.send_command('lua u powder; wait 1; lua u sparks; wait 1; lua u sellnpc')
+		if ipcflag == false then
+			ipcflag = true
+			windower.send_ipc_message('buy off')
+		end
+		ipcflag = false
+	end
+	
+	if settings.buy then
+	-- ACTIVE
+	if (cmd2 == 'shield') then
+		log('Buying shield!')
+		coroutine.sleep(5)
+		windower.send_command('sparks buy acheron shield')		
+		if ipcflag == false then
+			ipcflag = true
+			windower.send_ipc_message('buy shield')
+		end
+		ipcflag = false
+	elseif (cmd2 == 'powder' and settings.buy == true) then
+		log('Buying 948 powders!')
+		windower.send_command('powder buy 948')
+		if ipcflag == false then
+			ipcflag = true
+			windower.send_ipc_message('buy powder')
+		end
+		ipcflag = false
+	end
+	
+	end
+	
+	display_box()
+end
+
+
 function htmb(cmd2)
+	if cmd2 == 'enter' then
 		if ipcflag == false then
 			ipcflag = true
 			windower.send_ipc_message('htmb enter')
 		elseif ipcflag == true then
-			windower.send_command('input /targetnpc; wait 2; setkey enter down; wait 0.5; setkey enter up; wait 10; setkey down down; wait 0.5; setkey down up; wait 2.5; setkey up down; wait 0.5; setkey up up; setkey enter down; wait 0.5; setkey enter up')
+			windower.send_command('input /targetnpc; wait 2; setkey enter down; wait 0.5; setkey enter up; wait 10; setkey down down; wait 0.5; setkey down up; wait 2.5; setkey enter down; wait 0.5; setkey enter up; wait 1.0; setkey up down; wait 0.5; setkey up up; wait 1.0; setkey enter down; wait 0.5; setkey enter up')
 		end
 		ipcflag = false
+	elseif cmd2 == 'buy' then
+		windower.send_command('htmb')
+		if ipcflag == false then
+			ipcflag = true
+			windower.send_ipc_message('htmb buy')
+		end
+		ipcflag = false
+	end
 end
 
 
 function ein(cmd2)
 	
 	if (cmd2 == 'enter') then
+		--windower.send_command('settarget 17097342')
+		coroutine.sleep(3)
 		windower.send_command('input /targetnpc; wait 2; input /item \'glowing lamp\' <t>; wait 3; setkey up down; wait 0.5; setkey up up; wait 1; setkey enter down; wait 0.5; setkey enter up')
 		coroutine.sleep(10)
 		if ipcflag == false then
@@ -171,11 +234,11 @@ function restart()
 end
 
 
-function gettarget(cmd2)
-	if (cmd2 ~= nil) then
-		log('Get Target: ' .. cmd2)
-		local targetid = tostring(windower.ffxi.get_mob_by_name(cmd2).id)
-		windower.send_command('settarget ' .. targetid .. '')
+function gettarget(term)
+	if (term ~= nil) then
+		local targetid = windower.ffxi.get_mob_by_name('' .. term .. '')
+		log('Get Target: ' .. term .. ' ID: ' .. targetid.id)
+		windower.send_command('settarget ' .. targetid.id)
 	else
 		log('No target specified!')
 	end
@@ -399,6 +462,7 @@ function init_box_pos()
 
 	if burn_status then burn_status:destroy() end
 	if smn_help then smn_help:destroy() end
+	if buy_help then buy_help:destroy() end
 
 	local settings = windower.get_windower_settings()
 	local x,y
@@ -409,7 +473,9 @@ function init_box_pos()
 	--else
 	x,y = settings["ui_x_res"]-505, 45 -- -285, -18
 	--end
-	sx,sy = settings["ui_x_res"]-620, 45
+	sx,sy = settings["ui_x_res"]-630, 45
+	
+	bx,by = settings["ui_x_res"]-550, 45
 
 	local font = displayfont or 'Arial'
 	local size = displaysize or 11
@@ -428,6 +494,16 @@ function init_box_pos()
     smn_help:stroke_width(strokewidth)
     smn_help:stroke_transparency(stroketransparancy)
 	
+	buy_help = texts.new()
+	buy_help:pos(bx,by)
+    buy_help:font(font)--Arial
+    buy_help:size(size)
+    buy_help:bold(bold)
+    buy_help:bg_alpha(bg)--128
+    buy_help:right_justified(false)
+    buy_help:stroke_width(strokewidth)
+    buy_help:stroke_transparency(stroketransparancy)
+	
     burn_status = texts.new()
     burn_status:pos(x,y)
     burn_status:font(font)--Arial
@@ -442,6 +518,7 @@ function init_box_pos()
 	burn_status:pos(x,y)
 	
 	smn_help:pos(sx,sy)
+	buy_help:pos(bx,by)
 	
 	display_box()
 	--burn_status:show()
@@ -461,11 +538,20 @@ display_box = function()
 	
 	smn_help:clear()
 	smn_help:append(' ')
+	
+	buy_help:clear()
+	buy_help:append(' ')
 
 	if settings.smnhelp then
 		smn_help:append(string.format("%sSMN: %sON", clr.w, clr.r))
 	else
 		smn_help:clear()
+	end
+	
+	if settings.buy then
+		buy_help:append(string.format("%sBUY HELPER: %sON", clr.w, clr.r))
+	else
+		buy_help:clear()
 	end
 
     if settings.active then
@@ -508,8 +594,9 @@ display_box = function()
 		--burn_status:append(string.format("%s1HR Burn: %sOFF", clr.w, clr.w))
     end
 	
-
+	
 	smn_help:show()
+	buy_help:show()
 	burn_status:show()
 end
 
@@ -1336,6 +1423,11 @@ windower.register_event('ipc message', function(msg, ...)
 		coroutine.sleep(delay)
 		ipcflag = true
 		htmb(cmd2)	
+	elseif cmd == 'buy' then
+		log('IPC Buy')
+		coroutine.sleep(delay)
+		ipcflag = true
+		buy(cmd2)	
 	end
 	
 	
