@@ -119,6 +119,8 @@ windower.register_event('addon command', function(input, ...)
 		ein(cmd2)
 	elseif cmd == 'htmb' then
 		htmb(cmd2)
+	elseif cmd == 'runic' then
+		runic()
 	elseif cmd == 'buy' then
 		buy(cmd2)
     end
@@ -191,6 +193,21 @@ function htmb(cmd2)
 		end
 		ipcflag = false
 	end
+end
+
+function runic()
+
+	local runic_id = windower.ffxi.get_mob_by_name('Runic Portal').id
+	log(runic_id)
+	windower.send_command('settarget ' .. runic_id)
+	coroutine.sleep(1)
+	windower.send_command('input /lockon; wait 1; setkey enter down; wait 0.5; setkey enter up; wait 2; setkey up down; wait 0.5; setkey up up; wait 2; setkey enter down; wait 0.5; setkey enter up;')
+		
+	if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('runic')
+	end
+	ipcflag = false
 end
 
 
@@ -1423,6 +1440,11 @@ windower.register_event('ipc message', function(msg, ...)
 		coroutine.sleep(delay)
 		ipcflag = true
 		htmb(cmd2)	
+	elseif cmd == 'runic' then
+		log('IPC Runic')
+		coroutine.sleep(delay)
+		ipcflag = true
+		runic()	
 	elseif cmd == 'buy' then
 		log('IPC Buy')
 		coroutine.sleep(delay)
