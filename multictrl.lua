@@ -149,24 +149,24 @@ function buy(cmd2)
 	
 	if settings.buy then
 	-- ACTIVE
-	if (cmd2 == 'shield') then
-		log('Buying shield!')
-		coroutine.sleep(5)
-		windower.send_command('sparks buy acheron shield')		
-		if ipcflag == false then
-			ipcflag = true
-			windower.send_ipc_message('buy shield')
+		if (cmd2 == 'shield') then
+			log('Buying shield!')
+			coroutine.sleep(5)
+			windower.send_command('sparks buy acheron shield')		
+			if ipcflag == false then
+				ipcflag = true
+				windower.send_ipc_message('buy shield')
+			end
+			ipcflag = false
+		elseif (cmd2 == 'powder' and settings.buy == true) then
+			log('Buying 948 powders!')
+			windower.send_command('powder buy 948')
+			if ipcflag == false then
+				ipcflag = true
+				windower.send_ipc_message('buy powder')
+			end
+			ipcflag = false
 		end
-		ipcflag = false
-	elseif (cmd2 == 'powder' and settings.buy == true) then
-		log('Buying 948 powders!')
-		windower.send_command('powder buy 948')
-		if ipcflag == false then
-			ipcflag = true
-			windower.send_ipc_message('buy powder')
-		end
-		ipcflag = false
-	end
 	
 	end
 	
