@@ -153,7 +153,7 @@ function buy(cmd2)
 	-- ACTIVE
 		if (cmd2 == 'shield') then
 			log('Buying shield!')
-			coroutine.sleep(5)
+			--coroutine.sleep(5)
 			windower.send_command('sparks buy acheron shield')		
 			if ipcflag == false then
 				ipcflag = true
@@ -797,7 +797,7 @@ function geoburn()
 	player = windower.ffxi.get_player()
 	
 	if settings.active then
-		log('GEO Burn Activated for Bolster!')
+		windower.add_to_chat(123, 'GEO Burn Activated for Bolster!')
 		if player.main_job == 'GEO' then
 			log('GEO main job')
 			windower.send_command('geo off')
@@ -853,7 +853,8 @@ function smnburn()
 
 	player = windower.ffxi.get_player()
 	if settings.active then
-		log('SMN Burn active!')
+		--log('SMN Burn active!')
+		windower.add_to_chat(123, 'SMN Burn INTIATE!')
 		if player.main_job == 'SMN' then
 			log('SMN main job')
 			windower.send_command('hb on')
@@ -1118,7 +1119,7 @@ end
 function mount()
 
 	log('Mounting')
-	windower.send_command('input /mount \'Warmachine\'')
+	windower.send_command('input /mount \'Raaz\'')
 	if ipcflag == false then
 		ipcflag = true
 		windower.send_ipc_message('mount')
@@ -1309,49 +1310,40 @@ windower.register_event('ipc message', function(msg, ...)
 	
 	if cmd == 'mount' then
 		log('IPC Mount')
-		coroutine.sleep(delay)
 		ipcflag = true
 		mount()
 	elseif cmd == 'dismount' then
 		log('IPC Dismount')
-		coroutine.sleep(delay)
 		ipcflag = true
 		dismount()
 	elseif cmd == 'assist' then
 		if cmd2 == 'on' then
 			log('IPC Assist ON')
-			coroutine.sleep(delay)
 			ipcflag = true
 			assist(cmd2,cmd3)
 		elseif cmd2 == 'off' then
 			log('IPC Assist OFF')
-			coroutine.sleep(delay)
 			ipcflag = true
 			assist(cmd2)
 		end
 	elseif cmd == 'warp' then
 		log('IPC Warp')
-		coroutine.sleep(delay)
 		ipcflag = true
 		warp()
 	elseif cmd == 'on' then
 		log('IPC Turn ON')
-		coroutine.sleep(delay)
 		ipcflag = true
 		on()
 	elseif cmd == 'off' then
 		log('IPC Turn OFF')
-		coroutine.sleep(delay)
 		ipcflag = true
 		off()
 	elseif cmd == 'omen' then
 		log('IPC Omen')
-		coroutine.sleep(delay)
 		ipcflag = true
 		omen()
 	elseif cmd == 'followoff' then
 		log('IPC Follow OFF')
-		coroutine.sleep(delay)
 		ipcflag = true
 		followoff()
 	-- elseif cmd == 'followon' then
@@ -1412,12 +1404,10 @@ windower.register_event('ipc message', function(msg, ...)
 		send(send_cmd)
 	elseif cmd == 'smnhelp' then
 		log('IPC SMNHelp')
-		coroutine.sleep(delay)
 		ipcflag = true
 		smnhelp(cmd2)
 	elseif cmd == 'buff' then
 		log('IPC Buff')
-		coroutine.sleep(delay)
 		ipcflag = true
 		buff()
 	elseif cmd == 'terror' then
@@ -1427,7 +1417,6 @@ windower.register_event('ipc message', function(msg, ...)
 		terror()
 	elseif cmd == 'fight' then
 		log('IPC Fight')
-		coroutine.sleep(delay)
 		ipcflag = true
 		fight()
 	elseif cmd == 'ein' then
