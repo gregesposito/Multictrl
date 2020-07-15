@@ -14,13 +14,17 @@ texts = require('texts')
 
 default = {
 
-	avatar='ramuh',
-	indi='torpor',
-	dia=false,
+	avatar='ifrit',
+	indi='malaise',
+	dia=true,
 	active=false,
 	assist='',
 	smnhelp=false,
+	smnsc=false,
 	buy=false,
+	autows=false,
+	--autobuffmode=false,
+	
 }
 
 
@@ -121,11 +125,107 @@ windower.register_event('addon command', function(input, ...)
 		htmb(cmd2)
 	elseif cmd == 'runic' then
 		runic()
+	elseif cmd == 'done' then
+		done()
 	elseif cmd == 'buy' then
 		buy(cmd2)
+	elseif cmd == 'fin' then
+		fin()
+	elseif cmd == 'tag' then
+		tag()
+	elseif cmd == 'down' then
+		down()
+	elseif cmd == '30' then
+		cmd2 = '30'
+		fps(cmd2)
+	elseif cmd == '60' then
+		cmd2 = '60'
+		fps(cmd2)
+	elseif cmd == 'night' then
+		night()
+	elseif cmd == 'wake' then
+		wake()
+	elseif cmd == 'ws' then
+		ws(cmd2)
+	elseif cmd == 'lotall' then
+		lotall()
+	-- elseif cmd == 'autobuff' then
+		-- autobuff(cmd2)
     end
 	
 end)
+
+function lotall()
+	windower.send_command('send @all tr lotall;')
+end
+
+function ws(cmd2)
+	if cmd2 == nil then
+		if settings.autows then
+			log('AutoWS DISABLED')
+			settings.autows = false
+				if ipcflag == false then
+				ipcflag = true
+				windower.send_ipc_message('ws')
+			end
+			ipcflag = false
+		else
+			log('AutoWS ACTIVE')
+			settings.autows = true
+				if ipcflag == false then
+				ipcflag = true
+				windower.send_ipc_message('ws')
+			end
+			ipcflag = false
+		end
+	end
+	display_box()
+end
+
+function night()
+	windower.send_command('send @all lua u gearswap; wait 1.0; send @all lua u healbot; wait 1.0; send @all config FrameRateDivisor 2')	
+end
+
+function wake()
+	windower.send_command('send @all lua r healbot; wait 3.0; send @all lua r gearswap;')	
+end
+
+function fin()
+
+	log('Dispel/Finale on all chars that can do it')
+	local player_job = windower.ffxi.get_player()
+
+	if player_job.main_job == "BRD" then
+		windower.send_command('fin <t>')
+	elseif player_job.main_job == "RDM" or player_job.sub_job == "RDM" then
+		windower.send_command('dis <t>')
+	end
+	if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('fin')
+	end
+	ipcflag = false
+	
+end
+
+
+function fps(cmd2)
+
+
+	if cmd2 == "30" then
+		log('FPS is 30')
+		windower.send_command('config FrameRateDivisor 2')
+	elseif cmd2 == "60" then
+		log('FPS is 60')
+		windower.send_command('config FrameRateDivisor 1')
+	end
+	if ipcflag == false and cmd2 == "30" then
+		ipcflag = true
+		windower.send_ipc_message('fps ' .. cmd2)
+	end
+	ipcflag = false
+	
+end
 
 function buy(cmd2)
 
@@ -154,20 +254,59 @@ function buy(cmd2)
 		if (cmd2 == 'shield') then
 			log('Buying shield!')
 			--coroutine.sleep(5)
-			windower.send_command('sparks buy acheron shield')		
+			windower.send_command('sparks buyall acheron shield')		
 			if ipcflag == false then
 				ipcflag = true
 				windower.send_ipc_message('buy shield')
 			end
 			ipcflag = false
+		elseif (cmd2 == 'shi') then
+			log('Buying SINGLE CHAR SHIELD!')
+			--coroutine.sleep(5)
+			windower.send_command('sparks buyall acheron shield')		
 		elseif (cmd2 == 'powder' and settings.buy == true) then
-			log('Buying 948 powders!')
-			windower.send_command('powder buy 948')
+			log('Buying powders!')
+			windower.send_command('powder buy 3315')
 			if ipcflag == false then
 				ipcflag = true
 				windower.send_ipc_message('buy powder')
 			end
 			ipcflag = false
+		elseif (cmd2 == 'ss' and settings.buy == true) then
+			windower.send_command('sellnpc shield')
+			local targetid = windower.ffxi.get_mob_by_name('Corua')
+			
+			windower.send_command('settarget ' .. targetid.id)
+			coroutine.sleep(1)
+			windower.send_command('input /lockon; wait 1; setkey enter down; wait 0.5; setkey enter up;')
+			if ipcflag == false then
+				ipcflag = true
+				windower.send_ipc_message('buy ss')
+			end
+			ipcflag = false
+		elseif (cmd2 == 'sp' and settings.buy == true) then
+			windower.send_command('sellnpc powder')
+			local targetid = windower.ffxi.get_mob_by_name('Corua')
+			
+			windower.send_command('settarget ' .. targetid.id)
+			coroutine.sleep(1)
+			windower.send_command('input /lockon; wait 1; setkey enter down; wait 0.5; setkey enter up;')
+			if ipcflag == false then
+				ipcflag = true
+				windower.send_ipc_message('buy sp')
+			end
+			ipcflag = false	
+		elseif (cmd2 == 're' and settings.buy == true) then
+			windower.send_command('buy re')
+			
+			windower.send_command('lua r sparks; wait 0.5; lua r powder')
+
+			if ipcflag == false then
+				ipcflag = true
+				windower.send_ipc_message('buy re')
+			end
+			ipcflag = false	
+		
 		end
 	
 	end
@@ -182,11 +321,34 @@ function htmb(cmd2)
 			ipcflag = true
 			windower.send_ipc_message('htmb enter')
 		elseif ipcflag == true then
-			windower.send_command('input /targetnpc; wait 2; setkey enter down; wait 0.5; setkey enter up; wait 10; setkey down down; wait 0.5; setkey down up; wait 2.5; setkey enter down; wait 0.5; setkey enter up; wait 1.0; setkey up down; wait 0.5; setkey up up; wait 1.0; setkey enter down; wait 0.5; setkey enter up')
+			local zone = windower.ffxi.get_info()['zone']
+			local cloister_zones = S{201,202,203,207,209,211}
+			local targetid = 0
+			-- Avatar battles
+			if cloister_zones:contains(zone) then
+				if zone == 201 then
+					targetid = windower.ffxi.get_mob_by_name('Wind Protocrystal')
+				elseif zone == 202 then
+					targetid = windower.ffxi.get_mob_by_name('Lightning Protocrystal')
+				elseif zone == 203 then
+					targetid = windower.ffxi.get_mob_by_name('Ice Protocrystal')
+				elseif zone == 207 then
+					targetid = windower.ffxi.get_mob_by_name('Fire Protocrystal')
+				elseif zone == 209 then
+					targetid = windower.ffxi.get_mob_by_name('Earth Protocrystal')
+				elseif zone == 211 then
+					targetid = windower.ffxi.get_mob_by_name('Water Protocrystal')
+				end
+					log('Target: ' .. targetid.id)
+					windower.send_command('settarget ' .. targetid.id)
+					windower.send_command('wait 0.5; input /lockon; wait 2; setkey enter down; wait 0.5; setkey enter up; wait 6; setkey down down; wait 0.5; setkey down up; wait 1.0; setkey enter down; wait 0.5; setkey enter up; wait 1.0; setkey up down; wait 0.5; setkey up up; wait 1.0; setkey enter down; wait 0.5; setkey enter up')
+			else
+				windower.send_command('input /targetnpc; wait 1; input /lockon; wait 2; setkey enter down; wait 0.5; setkey enter up; wait 7; setkey down down; wait 0.5; setkey down up; wait 1.0; setkey enter down; wait 0.5; setkey enter up; wait 1.0; setkey up down; wait 0.5; setkey up up; wait 1.0; setkey enter down; wait 0.5; setkey enter up')
+			end
 		end
 		ipcflag = false
 	elseif cmd2 == 'buy' then
-		windower.send_command('htmb')
+		windower.send_command('htmb; wait 8; findall avatar phantom')
 		if ipcflag == false then
 			ipcflag = true
 			windower.send_ipc_message('htmb buy')
@@ -194,6 +356,20 @@ function htmb(cmd2)
 		ipcflag = false
 	end
 end
+
+function down()
+	local targ = windower.ffxi.get_mob_by_name('???').id
+	windower.send_command('settarget ' .. targ)
+	coroutine.sleep(1)
+	windower.send_command('input /lockon; wait 1; setkey enter down; wait 0.5; setkey enter up; wait 2; setkey down down; wait 0.5; setkey down up; wait 2; setkey enter down; wait 0.5; setkey enter up;')
+		
+	if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('down')
+	end
+	ipcflag = false
+end
+
 
 function runic()
 
@@ -210,13 +386,42 @@ function runic()
 	ipcflag = false
 end
 
+function tag()
+
+	log('tag')
+	windower.send_command('input /targetnpc; wait 2; setkey enter down; wait 0.5; setkey enter up; wait 2; input /targetnpc; wait 2; setkey enter down; wait 0.5; setkey enter up; wait 2.5; setkey enter down; wait 0.5; setkey enter up;')
+		
+	if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('tag')
+	end
+	ipcflag = false
+end
+
+function done()
+
+	local rol = windower.ffxi.get_mob_by_name('Rune of Release').id
+	local book = 'Leujaoam Log'
+	log(rol)
+
+		windower.send_command('settarget ' .. rol)
+		coroutine.sleep(1)
+		windower.send_command('input /lockon; wait 1; input /item \"' .. book .. '\" <t>')
+
+		
+	if ipcflag == false then
+		ipcflag = true
+		windower.send_ipc_message('done')
+	end
+	ipcflag = false
+end
 
 function ein(cmd2)
 	
 	if (cmd2 == 'enter') then
 		--windower.send_command('settarget 17097342')
 		coroutine.sleep(3)
-		windower.send_command('input /targetnpc; wait 2; input /item \'glowing lamp\' <t>; wait 3; setkey up down; wait 0.5; setkey up up; wait 1; setkey enter down; wait 0.5; setkey enter up')
+		windower.send_command('input /targetnpc; wait 1; input /lockon; wait 1; input /item \'glowing lamp\' <t>; wait 3; setkey up down; wait 0.5; setkey up up; wait 1; setkey enter down; wait 0.5; setkey enter up')
 		coroutine.sleep(10)
 		if ipcflag == false then
 			ipcflag = true
@@ -283,11 +488,11 @@ function fight()
 		if player_job.main_job == "WHM" then
 			windower.send_command('hb f dist 18')
 		elseif player_job.main_job == "GEO" or player_job.main_job == "BRD" then
-			windower.send_command('hb f dist 5')
-		elseif player_job.main_job == "SMN" or player_job.main_job == "BLM" or player_job.main_job == "SCH" then
+			windower.send_command('hb f dist 6')
+		elseif player_job.main_job == "SMN" or player_job.main_job == "BLM" or player_job.main_job == "SCH" or player_job.main_job == "RDM" then
 			windower.send_command('hb f dist 19')
 		else
-			windower.send_command('hb f dist 7')
+			windower.send_command('hb f dist 9')
 		end
 	end
 	ipcflag = false
@@ -379,6 +584,8 @@ function burnset(cmd2,cmd3,cmd4)
 				settings.indi = 'malaise'
 			elseif cmd3 == 'refresh' then
 				settings.indi = 'refresh'
+			elseif cmd3 == 'fury' then
+				settings.indi = 'fury'
 			end
 		else
 			log('Missing argument for INDI')
@@ -400,8 +607,16 @@ function burnset(cmd2,cmd3,cmd4)
 							-- if string.lower(v.name) == string.lower(player.name) then
 								-- windower.send_command('hb reload; wait 1.5; hb disable cure; hb disable na')
 							-- else
-								if player.main_job ~= 'WHM' and player.main_job ~= 'RUN' then
-									windower.send_command('hb reload; wait 1.5; hb disable cure; hb disable na; hb assist ' ..settings.assist .. ' wait 1.0; hb on')
+								if player.main_job ~= 'WHM' and player.main_job ~= 'RUN' and player.main_job ~= 'COR' and player.main_job ~= 'BRD' then
+									windower.send_command('hb reload; wait 1.5; hb disable cure; hb disable na; hb assist ' ..settings.assist .. '; wait 1.0; hb on')
+								end
+								if player.main_job == 'COR' then
+									windower.send_command('hb reload; wait 1.5; hb on')
+									if settings.indi == 'malaise' then
+										windower.send_command('roll roll1 beast; wait 1.0; roll roll2 pup;')
+									else
+										windower.send_command('roll roll1 beast; wait 1.0; roll roll2 drachen;')
+									end
 								end
 								-- Favor
 								if player.main_job == 'SMN' then
@@ -414,13 +629,18 @@ function burnset(cmd2,cmd3,cmd4)
 									end
 								end
 								if player.main_job == 'GEO' then
-									windower.send_command('lua r autogeo; wait 1.0; geo off; wait 1.5; geo geo frailty')
+										windower.send_command('gs c set autobuffmode off')
+									--windower.send_command('lua r autogeo; wait 1.0; geo off; wait 1.5; geo geo frailty')
 									if settings.indi == 'torpor' then
-										windower.send_command('geo indi torpor')
+										windower.send_command('gs c autogeo frailty; wait 1; gs c autoindi torpor')
 									elseif settings.indi == 'malaise' then
-										windower.send_command('geo indi malaise')
+										windower.send_command('gs c autogeo frailty; wait 1; gs c autoindi malaise')
+										coroutine.sleep(1.0)
+										windower.send_command('hb follow ' ..settings.assist .. '; wait 1.0; hb f dist 5')
 									elseif settings.indi == 'refresh' then
-										windower.send_command('geo indi refresh')
+										windower.send_command('gs c autogeo frailty; wait 1; gs c autoindi refresh')
+									elseif settings.indi == 'fury' then
+										windower.send_command('gs c autogeo frailty; wait 1; gs c autoindi fury')
 									end
 								end
 							--end
@@ -480,19 +700,24 @@ function init_box_pos()
 	if burn_status then burn_status:destroy() end
 	if smn_help then smn_help:destroy() end
 	if buy_help then buy_help:destroy() end
+	if ws_help then ws_help:destroy() end
 
 	local settings = windower.get_windower_settings()
 	local x,y
 	local sx,sy
+	local bx,by
+	local wx,wy
 	
 	--if settings["ui_x_res"] == 1920 and settings["ui_y_res"] == 1080 then
 		--x,y = settings["ui_x_res"]-1917, settings["ui_y_res"]-18 -- -285, -18
 	--else
-	x,y = settings["ui_x_res"]-505, 45 -- -285, -18
+	x,y = settings["ui_x_res"]-510, 95 -- -285, -18
 	--end
-	sx,sy = settings["ui_x_res"]-630, 45
+	sx,sy = settings["ui_x_res"]-625, 45
 	
-	bx,by = settings["ui_x_res"]-550, 45
+	bx,by = settings["ui_x_res"]-510, 65
+	
+	wx,wy = settings["ui_x_res"]-510, 45
 
 	local font = displayfont or 'Arial'
 	local size = displaysize or 11
@@ -531,11 +756,21 @@ function init_box_pos()
     burn_status:stroke_width(strokewidth)
     burn_status:stroke_transparency(stroketransparancy)
 	
+	ws_help = texts.new()
+	ws_help:pos(wx,wy)
+    ws_help:font(font)--Arial
+    ws_help:size(size)
+    ws_help:bold(bold)
+    ws_help:bg_alpha(bg)--128
+    ws_help:right_justified(false)
+    ws_help:stroke_width(strokewidth)
+    ws_help:stroke_transparency(stroketransparancy)
 
 	burn_status:pos(x,y)
 	
 	smn_help:pos(sx,sy)
 	buy_help:pos(bx,by)
+	ws_help:pos(wx,wy)
 	
 	display_box()
 	--burn_status:show()
@@ -558,13 +793,27 @@ display_box = function()
 	
 	buy_help:clear()
 	buy_help:append(' ')
+	
+	ws_help:clear()
+	ws_help:append(' ')
+	
 
 	if settings.smnhelp then
-		smn_help:append(string.format("%sSMN: %sON", clr.w, clr.r))
+		if settings.smnsc then
+			smn_help:append(string.format("%sSMN: %sON - SC", clr.w, clr.r))
+		else
+			smn_help:append(string.format("%sSMN: %sON", clr.w, clr.r))
+		end 
 	else
 		smn_help:clear()
 	end
 	
+	if settings.autows then
+		ws_help:append(string.format("%sWS/BUFF: %sON", clr.w, clr.r))
+	else
+		ws_help:clear()
+	end
+
 	if settings.buy then
 		buy_help:append(string.format("%sBUY HELPER: %sON", clr.w, clr.r))
 	else
@@ -614,6 +863,7 @@ display_box = function()
 	
 	smn_help:show()
 	buy_help:show()
+	ws_help:show()
 	burn_status:show()
 end
 
@@ -640,6 +890,26 @@ function smnhelp(cmd2)
 		end
 	end
 	if settings.smnhelp then
+		
+		if cmd2 == 'SC' then
+			if settings.smnsc then
+				log('SMN Skillchain DISABLED')
+				settings.smnsc = false
+					if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp SC')
+				end
+				ipcflag = false
+			else
+				log('SMN Skillchain ACTIVE')
+				settings.smnsc = true
+				if ipcflag == false then
+					ipcflag = true
+					windower.send_ipc_message('smnhelp SC')
+				end
+				ipcflag = false
+			end
+		end
 		
 		if currentPC.main_job == 'SMN' then
 
@@ -669,59 +939,123 @@ function smnhelp(cmd2)
 				ipcflag = false
 			
 			elseif cmd2 == 'VS' then
-				if ipcflag == false then
-					ipcflag = true
-					windower.send_ipc_message('smnhelp VS')
+			
+				if settings.smnsc then
+					if ipcflag == false then
+						ipcflag = true
+						coroutine.sleep(3.5)
+						windower.send_ipc_message('smnhelp FC')
+					else
+						windower.send_command('input /ja "Volt Strike" <t>')
+					end
+					ipcflag = false
 				else
-					windower.send_command('input /ja "Volt Strike" <t>')
+					if ipcflag == false then
+						ipcflag = true
+						windower.send_ipc_message('smnhelp VS')
+					else
+						windower.send_command('input /ja "Volt Strike" <t>')
+					end
+					ipcflag = false
 				end
-				ipcflag = false
 			
 			elseif cmd2 == 'FC' then
-				if ipcflag == false then
-					ipcflag = true
-					windower.send_ipc_message('smnhelp FC')
+				
+				if settings.smnsc then
+					if ipcflag == false then
+						ipcflag = true
+						coroutine.sleep(3.5)
+						windower.send_ipc_message('smnhelp VS')
+					else
+						windower.send_command('input /ja "Flaming Crush" <t>')
+					end
+					ipcflag = false
 				else
-					windower.send_command('input /ja "Flaming Crush" <t>')
+					if ipcflag == false then
+						ipcflag = true
+						windower.send_ipc_message('smnhelp FC')
+					else
+						windower.send_command('input /ja "Flaming Crush" <t>')
+					end
+					ipcflag = false
 				end
-				ipcflag = false
 				
 			elseif cmd2 == 'HA' then
-				if ipcflag == false then
-					ipcflag = true
-					windower.send_ipc_message('smnhelp HA')
+			
+				if settings.smnsc then
+					if ipcflag == false then
+						ipcflag = true
+						coroutine.sleep(3.5)
+						windower.send_ipc_message('smnhelp FC')
+					else
+						windower.send_command('input /ja "Hysteric Assault" <t>')
+					end
+					ipcflag = false
 				else
-					windower.send_command('input /ja "Hysteric Assault" <t>')
-				end
-				ipcflag = false
+					if ipcflag == false then
+						ipcflag = true
+						windower.send_ipc_message('smnhelp HA')
+					else
+						windower.send_command('input /ja "Hysteric Assault" <t>')
+					end
+					ipcflag = false
+				end				
 			
 			elseif cmd2 == 'ramuh' then
-				if ipcflag == false then
-					ipcflag = true
-					windower.send_ipc_message('smnhelp ramuh')
+				if settings.smnsc then
+					if ipcflag == false then
+						ipcflag = true
+						windower.send_ipc_message('smnhelp ifrit')
+					else
+						windower.send_command('input /ma "Ramuh" <me>')
+					end
+					ipcflag = false
 				else
-					windower.send_command('input /ma "Ramuh" <me>')
+					if ipcflag == false then
+						ipcflag = true
+						windower.send_ipc_message('smnhelp ramuh')
+					else
+						windower.send_command('input /ma "Ramuh" <me>')
+					end
+					ipcflag = false
 				end
-				ipcflag = false
-			
 			elseif cmd2 == 'ifrit' then
-				if ipcflag == false then
-					ipcflag = true
-					windower.send_ipc_message('smnhelp ifrit')
+				if settings.smnsc then
+					if ipcflag == false then
+						ipcflag = true
+						windower.send_ipc_message('smnhelp ramuh')
+					else
+						windower.send_command('input /ma "Ifrit" <me>')
+					end
+					ipcflag = false
 				else
-					windower.send_command('input /ma "Ifrit" <me>')
+					if ipcflag == false then
+						ipcflag = true
+						windower.send_ipc_message('smnhelp ifrit')
+					else
+						windower.send_command('input /ma "Ifrit" <me>')
+					end
+					ipcflag = false
 				end
-				ipcflag = false
 				
 			elseif cmd2 == 'siren' then
-				if ipcflag == false then
-					ipcflag = true
-					windower.send_ipc_message('smnhelp siren')
+				if settings.smnsc then
+					if ipcflag == false then
+						ipcflag = true
+						windower.send_ipc_message('smnhelp ifrit')
+					else
+						windower.send_command('input /ma "Siren" <me>')
+					end
+					ipcflag = false	
 				else
-					windower.send_command('input /ma "Siren" <me>')
+					if ipcflag == false then
+						ipcflag = true
+						windower.send_ipc_message('smnhelp siren')
+					else
+						windower.send_command('input /ma "Siren" <me>')
+					end
+					ipcflag = false	
 				end
-				ipcflag = false	
-				
 			elseif cmd2 == 'apogee' then
 				if ipcflag == false then
 					ipcflag = true
@@ -800,7 +1134,7 @@ function geoburn()
 		windower.add_to_chat(123, 'GEO Burn Activated for Bolster!')
 		if player.main_job == 'GEO' then
 			log('GEO main job')
-			windower.send_command('geo off')
+			windower.send_command('gs c set autobuffmode off')
 			windower.send_command('hb disable cure')
 			windower.send_command('hb disable na')
 			windower.send_command('hb on')
@@ -833,7 +1167,7 @@ function geoburn()
 			windower.send_command('hb enable cure')
 			windower.send_command('hb enable na')
 			windower.send_command('hb mincure 3')
-			windower.send_command('geo on')
+			windower.send_command('gs c set autobuffmode auto')
 
 		else
 			log('Not GEO job, skipping')
@@ -894,14 +1228,31 @@ end
 
 function assist(cmd,namearg)
 	
-	if cmd == 'on' then
+	if cmd == 'melee' then
 	
 		if ipcflag == false then
-			log('Assist Leader!')
+			log('Setting current character as leader!')
 			ipcflag = true
 			windower.send_command('hb assist off')
 			windower.send_command('hb assist attack off')
-			windower.send_ipc_message('assist on ' .. currentPC.name)
+			windower.send_ipc_message('assist melee ' .. currentPC.name)
+		elseif ipcflag == true then
+			local player_job = windower.ffxi.get_player()
+			local MeleeJobs = S{'WAR','SAM','DRG','DRK','NIN','MNK','COR','BLU','PUP','DNC','RUN'}		
+			if MeleeJobs:contains(player_job.main_job) then
+				log('Assist & Attack -> ' ..namearg)
+				windower.send_command('hb assist ' .. namearg)
+				windower.send_command('wait 0.5; hb assist attack on')
+				windower.send_command('wait 0.5; hb on')
+			end
+		end
+	elseif cmd == 'all' then
+		if ipcflag == false then
+			log('Setting current character as leader!')
+			ipcflag = true
+			windower.send_command('hb assist off')
+			windower.send_command('hb assist attack off')
+			windower.send_ipc_message('assist all ' .. currentPC.name)
 		elseif ipcflag == true then
 			log('Assist & Attack -> ' ..namearg)
 			windower.send_command('hb assist ' .. namearg)
@@ -978,7 +1329,7 @@ function d2()
 			if type(v) == 'table' then
 				if v.name ~= currentPC.name then
 				
-					coroutine.sleep(1)
+					coroutine.sleep(0.55)
 				
 					ptymember = windower.ffxi.get_mob_by_name(v.name)
 					-- check if party member in same zone.
@@ -986,7 +1337,7 @@ function d2()
 					if v.mob == nil then
 						-- Not in zone.
 						log(v.name .. ' is not in zone, skipping')
-						coroutine.sleep(0.5)
+						--coroutine.sleep(0.5)
 					else
 						-- In zone, do distance check
 						if math.sqrt(ptymember.distance) < 18 then
@@ -1032,7 +1383,7 @@ function d2()
 							end
 						
 								isWaiting = true								
-								coroutine.sleep(1.5)
+								coroutine.sleep(1.63)
 								windower.send_command('input /ma "Warp II" ' .. v.name)
 								coroutine.sleep(1)
 								log('Warping ' .. v.name)
@@ -1044,7 +1395,7 @@ function d2()
 
 						else
 							log(v.name .. ' is too far to warp, skipping')
-							coroutine.sleep(0.5)
+							--coroutine.sleep(0.5)
 						end
 					end
 
@@ -1055,7 +1406,7 @@ function d2()
 
 		-- Warp self
 	
-		coroutine.sleep(1.5)
+		coroutine.sleep(0.25)
 		isWaiting = true
 		RCast = windower.ffxi.get_spell_recasts()
 	
@@ -1095,7 +1446,7 @@ function d2()
 			
 		end
 
-		coroutine.sleep(1.5)
+		coroutine.sleep(1.1)
 		log('Warping')
 		windower.send_command('input /ma "Warp" ' .. currentPC.name)
 		
@@ -1150,11 +1501,25 @@ end
 function on()
 	log('Turning on addon stuff...')
 	local player_job = windower.ffxi.get_player()
+	local MeleeJobs = S{'WAR','SAM','DRG','DRK','NIN','MNK','COR','BLU','PUP','DNC','RUN'}
 	if player_job.main_job == "GEO" then
 		windower.send_command('geo on')
 		windower.send_command('gs c set autobuffmode auto')
 	elseif player_job.main_job == "RUN" then
 		windower.send_command('gs c set autorunemode on')
+	end
+	-- WS/Buff mode
+	if MeleeJobs:contains(player_job.main_job) then
+		if settings.autows then
+			windower.send_command('gs c set autowsmode on;')
+			windower.send_command('gs c set autobuffmode auto;')
+			if player_job.main_job == "DRG" then
+				windower.send_command('gs c set autojumpmode auto;')
+			end
+		end
+		
+		--elseif settings.autobuffmode then
+			--windower.send_command('gs c set autobuffmode on;')
 	end
 	windower.send_command('hb on')
 	windower.send_command('roller on')
@@ -1176,10 +1541,14 @@ function off()
 	elseif player_job.main_job == "RUN" then
 		windower.send_command('gs c set autorunemode off')
 		windower.send_command('gs c set autotankmode off')
+	elseif player_job.main_job == "DRG" then
+		windower.send_command('gs c set autojumpmode off')
 	end
 	windower.send_command('hb off')
 	windower.send_command('roller off')
 	windower.send_command('singer off')
+	windower.send_command('gs c set autowsmode off;')
+	windower.send_command('gs c set autobuffmode off;')
 	if ipcflag == false then
 		ipcflag = true
 		windower.send_ipc_message('off')
@@ -1317,8 +1686,12 @@ windower.register_event('ipc message', function(msg, ...)
 		ipcflag = true
 		dismount()
 	elseif cmd == 'assist' then
-		if cmd2 == 'on' then
-			log('IPC Assist ON')
+		if cmd2 == 'melee' then
+			log('IPC Assist MELEE')
+			ipcflag = true
+			assist(cmd2,cmd3)
+		elseif cmd2 == 'all' then
+			log('IPC Assist ALL')
 			ipcflag = true
 			assist(cmd2,cmd3)
 		elseif cmd2 == 'off' then
@@ -1426,7 +1799,8 @@ windower.register_event('ipc message', function(msg, ...)
 		ein(cmd2)
 	elseif cmd == 'htmb' then
 		log('IPC HTMB')
-		coroutine.sleep(delay)
+		local moredelay = delay + 0.3
+		coroutine.sleep(moredelay)
 		ipcflag = true
 		htmb(cmd2)	
 	elseif cmd == 'runic' then
@@ -1434,11 +1808,40 @@ windower.register_event('ipc message', function(msg, ...)
 		coroutine.sleep(delay)
 		ipcflag = true
 		runic()	
+	elseif cmd == 'done' then
+		log('IPC DONE')
+		coroutine.sleep(delay)
+		ipcflag = true
+		done()	
 	elseif cmd == 'buy' then
 		log('IPC Buy')
 		coroutine.sleep(delay)
 		ipcflag = true
 		buy(cmd2)	
+	elseif cmd == 'fin' then
+		log('IPC Dispel/Finale')
+		--coroutine.sleep(delay)
+		ipcflag = true
+		fin()	
+	elseif cmd == 'tag' then
+		log('IPC Tag')
+		coroutine.sleep(delay)
+		ipcflag = true
+		tag()	
+	elseif cmd == 'down' then
+		log('IPC Down')
+		coroutine.sleep(delay)
+		ipcflag = true
+		down()	
+	elseif cmd == 'fps' then
+		log('IPC FPS')
+		coroutine.sleep(delay)
+		ipcflag = true
+		fps(cmd2)
+	elseif cmd == 'ws' then
+		log('IPC AutoWS')
+		ipcflag = true
+		ws(cmd2)
 	end
 	
 	
