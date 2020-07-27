@@ -27,8 +27,13 @@ default = {
 	
 }
 
-SpecificCMDS = S{'d2','fon','buy','assist','burn','smnhelp','send','gettarget','30','60','runic','tag','done','ein','htmb'}
-InternalCMDS = S{'on','off','night','wake','foff','mnt','dis','reload','unload','fin','lotall','smnburn','geoburn','buff','fight','ws','trib','rads','buyalltemps','warp','omen'}
+InternalCMDS = S{
+	'on','off','night','wake','foff',
+	'mnt','dis','reload','unload','fin',
+	'lotall','smnburn','geoburn','buff',
+	'fight','ws','trib','rads','buyalltemps',
+	'warp','omen'}
+
 DelayCMDS = S{'trib','rads','buyalltemps'}
 	
 isCasting = false
@@ -1490,8 +1495,6 @@ windower.register_event('ipc message', function(msg, ...)
 	local cmd4 = args[4]
 	args:remove(1)
 	local delay = get_delay()
-	
-		
 	local term = msg:split(' ')
 	term:remove(1)
 	local send_cmd = table.concat(term, " ")
@@ -1549,7 +1552,7 @@ windower.register_event('ipc message', function(msg, ...)
 		buy(cmd2)	
 
 
-
+	-- Might move these to separate addon
 	elseif cmd == 'ein' then
 		log('IPC Ein')
 		coroutine.sleep(delay)
