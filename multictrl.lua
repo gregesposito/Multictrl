@@ -14,8 +14,8 @@ texts = require('texts')
 
 default = {
 
-	avatar='ifrit',
-	indi='malaise',
+	avatar='ramuh',
+	indi='refresh',
 	dia=true,
 	active=false,
 	assist='',
@@ -27,7 +27,7 @@ default = {
 	
 }
 
-	
+SpecificCMDS = S{'d2','fon','buy','assist','burn','smnhelp','send','gettarget','30','60','runic','tag','done','ein','htmb'}
 InternalCMDS = S{'on','off','night','wake','foff','mnt','dis','reload','unload','fin','lotall','smnburn','geoburn','buff','fight','ws','trib','rads','buyalltemps','warp','omen'}
 DelayCMDS = S{'trib','rads','buyalltemps'}
 	
@@ -54,7 +54,11 @@ windower.register_event('incoming chunk', function(id, data)
 end)
 
 windower.register_event('addon command', function(input, ...)
-    local cmd = string.lower(input)
+	local cmd
+    if input ~= nil then
+		cmd = string.lower(input)	
+	end
+
 	local args = {...}
 	local cmd2 = args[1]
 	local cmd3 = args[2]
@@ -67,8 +71,9 @@ windower.register_event('addon command', function(input, ...)
         return entity and entity.id or '<' .. target_string .. 'id>'
     end)
 
-	
-	if cmd == 'restart' then
+	if cmd == nil then
+		windower.add_to_chat(123,"Abort: No command specified")
+	elseif cmd == 'restart' then
 		restart()
 		
 	-- Move these to addon?
@@ -106,6 +111,7 @@ windower.register_event('addon command', function(input, ...)
 	elseif cmd == 'gettarget' then
 		gettarget(term)
 	elseif InternalCMDS:contains(cmd) then
+	--elseif not(SpecificCMDS:contains(cmd)) then
 		send_int_cmd(cmd,cmd2)
 	end
 
@@ -537,7 +543,7 @@ end
 function buff()
 	log('Buffing Up!')
 	local player_job = windower.ffxi.get_player()
-	local buff_jobs = S{"WHM","RDM","GEO","BRD","SMN"}
+	local buff_jobs = S{"WHM","RDM","GEO","BRD","SMN","BLM","SCH","RUN"}
 	if buff_jobs:contains(player_job.main_job) then
 		windower.send_command('gs c buffup')
 	end
@@ -597,7 +603,8 @@ function fps(cmd2)
 end
 
 function assist(cmd,namearg)
-	
+
+	currentPC=windower.ffxi.get_player()
 	if cmd == 'melee' then
 	
 		if ipcflag == false then
@@ -1488,7 +1495,6 @@ windower.register_event('ipc message', function(msg, ...)
 	local term = msg:split(' ')
 	term:remove(1)
 	local send_cmd = table.concat(term, " ")
-	local SpecificCMDS = S{'assist','trib','rads','buyalltemps','send','burnset'}	
 	
 	if (InternalCMDS:contains(cmd)) then
 		if cmd2 == nil then
@@ -1520,19 +1526,29 @@ windower.register_event('ipc message', function(msg, ...)
 			ipcflag = true
 			assist(cmd2)
 		end
-	elseif cmd == 'burnset' then
-		log('IPC Burn Settings')
+	elseif cmd == 'fps' then
+		log('IPC FPS')
 		ipcflag = true
-		burnset(cmd2, cmd3, cmd4)
+		fps(cmd2)
 	elseif cmd == 'send' then
 		log('IPC Send: ' .. send_cmd)
 		coroutine.sleep(delay)
 		ipcflag = true
 		send(send_cmd)
+	elseif cmd == 'burnset' then
+		log('IPC Burn Settings')
+		ipcflag = true
+		burnset(cmd2, cmd3, cmd4)
 	elseif cmd == 'smnhelp' then
 		log('IPC SMNHelp')
 		ipcflag = true
 		smnhelp(cmd2)
+	elseif cmd == 'buy' then
+		log('IPC Buy')
+		ipcflag = true
+		buy(cmd2)	
+
+
 
 	elseif cmd == 'ein' then
 		log('IPC Ein')
@@ -1555,22 +1571,12 @@ windower.register_event('ipc message', function(msg, ...)
 		coroutine.sleep(delay)
 		ipcflag = true
 		done()	
-	elseif cmd == 'buy' then
-		log('IPC Buy')
-		ipcflag = true
-		buy(cmd2)	
 	elseif cmd == 'tag' then
 		log('IPC Tag')
 		coroutine.sleep(delay)
 		ipcflag = true
 		tag()	
-	elseif cmd == 'fps' then
-		log('IPC FPS')
-		ipcflag = true
-		fps(cmd2)
 	end
-	
-	
 end)
 
 function loaded()
