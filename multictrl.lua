@@ -1,6 +1,6 @@
 _addon.name = 'Multictrl'
 _addon.author = 'Kate'
-_addon.version = '1.2.0.5'
+_addon.version = '1.5.3.1'
 _addon.commands = {'multi','mc'}
 
 require('functions')
@@ -116,7 +116,6 @@ windower.register_event('addon command', function(input, ...)
 	elseif cmd == 'gettarget' then
 		gettarget(term)
 	elseif InternalCMDS:contains(cmd) then
-	--elseif not(SpecificCMDS:contains(cmd)) then
 		send_int_cmd(cmd,cmd2)
 	end
 
