@@ -1506,14 +1506,16 @@ windower.register_event('ipc message', function(msg, ...)
 			if(DelayCMDS:contains(cmd)) then
 				coroutine.sleep(delay)
 			end
-			loadstring(cmd.."()")()
+			send_int_cmd(cmd)
+			--loadstring(cmd.."()")()
 		else
 			log('IPC: ' .. cmd)
 			ipcflag = true
 			if(DelayCMDS:contains(cmd)) then
 				coroutine.sleep(delay)
 			end
-			_G[cmd](cmd2)
+			send_int_cmd(cmd,cmd2)
+			--_G[cmd](cmd2)
 		end
 	elseif cmd == 'assist' then
 		if cmd2 == 'melee' then
