@@ -459,11 +459,11 @@ function ws(cmd2)
 end
 
 function night()
-	windower.send_command('lua u gearswap; wait 1.0; send @all lua u healbot; wait 1.0; send @all config FrameRateDivisor 2')	
+	windower.send_command('lua u gearswap; wait 1.0; lua u healbot; wait 1.0; config FrameRateDivisor 2')	
 end
 
 function wake()
-	windower.send_command('lua r healbot; wait 3.0; send @all lua r gearswap;')	
+	windower.send_command('lua r healbot; wait 3.0; lua r gearswap;')	
 end
 
 function buy(cmd2)
