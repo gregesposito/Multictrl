@@ -1231,11 +1231,6 @@ function geoburn()
 			windower.send_command('hb disable cure')
 			windower.send_command('hb disable na')
 			windower.send_command('hb on')
-			if ipcflag == false then
-				ipcflag = true
-				windower.send_ipc_message('geoburn')
-			end
-			ipcflag = false
 			
 			coroutine.sleep(1.7)
 			windower.send_command('input /ja "Bolster" <me>')
@@ -1279,11 +1274,6 @@ function smnburn()
 		if player.main_job == 'SMN' then
 			log('SMN main job')
 			windower.send_command('hb on')
-			if ipcflag == false then
-				ipcflag = true
-				windower.send_ipc_message('smnburn')
-			end
-			ipcflag = false
 			-- check distance 21 or less
 			coroutine.sleep(1.5)
 			windower.send_command('input /ja "Astral Flow" <me>')
