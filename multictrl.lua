@@ -78,9 +78,7 @@ windower.register_event('addon command', function(input, ...)
 
 	if cmd == nil then
 		windower.add_to_chat(123,"Abort: No command specified")
-	elseif cmd == 'restart' then
-		restart()
-		
+
 	-- Move these to addon?
 		elseif cmd == 'runic' then
 			runic()
@@ -322,10 +320,6 @@ end
 
 -- Sub functions
 
-function restart()
-	windower.send_command('send @all lua r multictrl')
-end
-
 function mnt()
 	windower.send_command('input /mount \'Red Crab\'')
 end
@@ -425,7 +419,7 @@ end
 function reload(addonarg)
 	log('Reload Specific ADDON.')
 	if addonarg == 'multictrl' then
-		log('Not supported! Use restart to reload MultiCtrl!')
+		log('Not supported!')
 	else
 		windower.send_command('lua r ' ..addonarg)
 	end
