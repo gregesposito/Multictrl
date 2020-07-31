@@ -638,6 +638,17 @@ function assist(cmd,namearg)
 			windower.send_command('wait 0.5; hb assist attack on')
 			windower.send_command('wait 0.5; hb on')
 		end
+	elseif cmd == 'on' then
+		if ipcflag == false then
+			log('Leader for assisting in spells.')
+			ipcflag = true
+			windower.send_command('hb assist off')
+			windower.send_command('hb assist attack off')
+			windower.send_ipc_message('assist on ' .. currentPC.name)
+		elseif ipcflag == true then
+			log('Assist ONLY -> ' ..namearg)
+			windower.send_command('hb assist ' .. namearg)
+		end
 	elseif cmd == 'off' then
 		if ipcflag == false then
 			ipcflag = true
@@ -1507,6 +1518,10 @@ windower.register_event('ipc message', function(msg, ...)
 			assist(cmd2,cmd3)
 		elseif cmd2 == 'all' then
 			log('IPC Assist ALL')
+			ipcflag = true
+			assist(cmd2,cmd3)
+		elseif  cmd2 == 'on' then
+			log('IPC Assist ON')
 			ipcflag = true
 			assist(cmd2,cmd3)
 		elseif cmd2 == 'off' then
