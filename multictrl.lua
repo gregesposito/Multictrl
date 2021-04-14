@@ -16,7 +16,9 @@ default = {
 
 	avatar='ramuh',
 	indi='refresh',
+	food=true,
 	dia=true,
+	impact=false,		
 	active=false,
 	assist='',
 	smnhelp=false,
@@ -290,7 +292,18 @@ display_box = function()
 		else
 			burn_status:append(string.format("\n%s DIA: %sOFF", clr.w, clr.w))
 		end
+		if settings.food then
+			burn_status:append(string.format("\n%s SMN Food: %sON", clr.w, clr.r))
+		else
+			burn_status:append(string.format("\n%s SMN Food: %sOFF", clr.w, clr.r))
+		end
+	
 		
+		if settings.impact then
+			burn_status:append(string.format("\n%s IMPACT: %sON", clr.w, clr.r))
+		else
+			burn_status:append(string.format("\n%s IMPACT: %sOFF", clr.w, clr.w))
+		end
 		if settings.indi == 'torpor' then
 			burn_status:append(string.format("\n%s Indi Spell: %s" .. settings.indi, clr.w, clr.h))
 		elseif settings.indi == 'malaise' then
@@ -373,6 +386,7 @@ function off()
 	windower.send_command('singer off')
 	windower.send_command('gs c set autowsmode off;')
 	windower.send_command('gs c set autobuffmode off;')
+	windower.send_command('gs c set autofoodmode off;')
 end
 
 function fon()
@@ -835,9 +849,12 @@ function burnset(cmd2,cmd3,cmd4)
 		windower.add_to_chat(122,'\ ')
 		windower.add_to_chat(122,'-Commands- \ \ \ -Variables- \n')
 		windower.add_to_chat(122,'\ ')
-		windower.add_to_chat(122,'\ avatar \ \ \ \ \ \ \ \ \ ramuh/ifrit')
+		windower.add_to_chat(122,'\ avatar \ \ \ \ \ \ \ \ \ ramuh/ifrit/siren')
+		windower.add_to_chat(122,'\ food \ \ \ \ \ \ \ \ \ \ \ on/off')
+		windower.add_to_chat(122,'\ shot \ \ \ \ \ \ \ \ \ \ \ on/off')
+		windower.add_to_chat(122,'\ impact \ \ \ \ \ \ \ \ \ on/off')
 		windower.add_to_chat(122,'\ dia \ \ \ \ \ \ \ \ \ \ \ \ \ on/off')
-		windower.add_to_chat(122,'\ indi \ \ \ \ \ \ \ \ \ \ \ \ torpor/malaise')
+		windower.add_to_chat(122,'\ indi \ \ \ \ \ \ \ \ \ \ \ \ torpor/malaise/refresh')
 		windower.add_to_chat(122,'\ assist \ \ \ \ \ \ \ \ \ \ name of character that is engaging mob')
 		windower.add_to_chat(123,'\ init \ \ \ \ \ \ \ \ \ \ \ \ *** Intializes commands to all chars, MUST RUN THIS AFTER setting variables. ***')
 	elseif cmd2 == 'off' then
@@ -855,6 +872,18 @@ function burnset(cmd2,cmd3,cmd4)
 		else
 			log('Missing argument for DIA')
 		end
+	elseif cmd2 == 'impact' then
+		if cmd3 ~= nil then
+			if cmd3 == 'on' then
+				settings.impact = true
+			elseif cmd3 == 'off' then
+				settings.impact = false
+			else
+				log('Invalid impact choice')
+			end
+		else
+			log('Missing argument for impact')
+		end						   
 	elseif cmd2 == 'indi' then
 		if cmd3 ~= nil then
 			if cmd3 == 'torpor' then
@@ -900,12 +929,22 @@ function burnset(cmd2,cmd3,cmd4)
 								-- Favor
 								if player.main_job == 'SMN' then
 									if settings.avatar == 'ramuh' then
-										windower.send_command('input /ma "Ramuh" <me>; wait 5; input /ja "Avatar\'s Favor" <me>')
+											windower.send_command('input /ma "Ramuh" <me>; wait 6; input /ja "Avatar\'s Favor" <me>; wait 2; input /item "Grape Daifuku" <me>')
+										else
+											windower.send_command('input /ma "Ramuh" <me>; wait 6; input /ja "Avatar\'s Favor" <me>')
+										end
 									elseif settings.avatar == 'ifrit' then
-										windower.send_command('input /ma "Ifrit" <me>; wait 5; input /ja "Avatar\'s Favor" <me>')
+										if settings.food then
+											windower.send_command('input /ma "Ifrit" <me>; wait 6; input /ja "Avatar\'s Favor" <me>; wait 2; input /item "Grape Daifuku" <me>')
+										else
+											windower.send_command('input /ma "Ifrit" <me>; wait 6; input /ja "Avatar\'s Favor" <me>')
+										end
 									elseif settings.avatar == 'siren' then
-										windower.send_command('input /ma "Siren" <me>; wait 5; input /ja "Avatar\'s Favor" <me>')
-									end
+										if settings.food then
+											windower.send_command('input /ma "Siren" <me>; wait 6; input /ja "Avatar\'s Favor" <me>; wait 2; input /item "Grape Daifuku" <me>')
+										else
+											windower.send_command('input /ma "Siren" <me>; wait 6; input /ja "Avatar\'s Favor" <me>')
+										end
 								end
 								if player.main_job == 'GEO' then
 										windower.send_command('gs c set autobuffmode off')
@@ -1259,10 +1298,13 @@ function geoburn()
 			windower.send_command('input /ja "Dematerialize" <me>')
 			coroutine.sleep(0.75)
 			if settings.dia then
-				windower.send_command('hb debuff dia II')
-			elseif not settings.dia then
-				windower.send_command('hb debuff rm dia II')
+				windower.send_command('input /ma "Dia II" <t>')
 			end
+			coroutine.sleep(0.75)
+			if settings.impact then
+				windower.send_command('input /ma "Impact" <t>')
+			end						  
+			coroutine.sleep(6.0)								 
 			windower.send_command('hb enable cure')
 			windower.send_command('hb enable na')
 			windower.send_command('hb mincure 3')
